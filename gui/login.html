@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Government RAG Assistant - Login</title>
+
+</head>
+
+
+<body>
+
+    <h1>Government RAG Assistant</h1>
+
+    <h2>Login</h2>
+
+
+    <label for="userId">
+        ID:
+    </label>
+
+    <br><br>
+
+    <input
+        type="text"
+        id="userId"
+        placeholder="Enter ID"
+    >
+
+
+    <br><br>
+
+
+    <label for="password">
+        Password:
+    </label>
+
+    <br><br>
+
+    <input
+        type="password"
+        id="password"
+        placeholder="Enter Password"
+    >
+
+
+    <br><br>
+
+
+    <button onclick="login()">
+        Login
+    </button>
+
+
+    <br><br>
+
+
+    <div id="result"></div>
+
+
+    <script>
+
+        function login() {
+
+            const userId =
+                document.getElementById("userId").value;
+
+            const password =
+                document.getElementById("password").value;
+
+
+            if (!userId || !password) {
+
+                document.getElementById("result").innerText =
+                    "Please enter ID and password.";
+
+                return;
+            }
+
+
+            fetch("/login", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    id: userId,
+
+                    password: password
+
+                })
+
+            })
+
+
+            .then(response => response.json())
+
+
+            .then(data => {
+
+                if (data.success) {
+
+                    if (data.role === "admin") {
+
+                        window.location.href = "/admin";
+
+                    }
+
+                    else if (data.role === "user") {
+
+                        window.location.href = "/user";
+
+                    }
+
+                }
+
+                else {
+
+                    document.getElementById("result").innerText =
+                        data.message;
+
+                }
+
+            })
+
+
+            .catch(error => {
+
+                document.getElementById("result").innerText =
+                    "Error connecting to Flask server.";
+
+                console.error(error);
+
+            });
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>

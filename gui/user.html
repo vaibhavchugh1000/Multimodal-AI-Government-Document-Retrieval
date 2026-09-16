@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Government RAG Assistant - User</title>
+
+</head>
+
+
+<body>
+
+    <h1>Government RAG Assistant</h1>
+
+    <h2>Citizen Panel</h2>
+
+
+    <label for="query">
+        Ask your question:
+    </label>
+
+    <br><br>
+
+
+    <textarea
+        id="query"
+        rows="5"
+        cols="70"
+        placeholder="Enter your question here..."
+    ></textarea>
+
+
+    <br><br>
+
+
+    <button onclick="askQuestion()">
+        Ask Question
+    </button>
+
+
+    <br><br>
+
+
+    <h3>Answer</h3>
+
+    <div id="answer">
+        No answer yet.
+    </div>
+
+
+    <br>
+
+
+    <h3>Detected Language</h3>
+
+    <div id="language">
+        -
+    </div>
+
+
+    <br>
+
+
+    <h3>Sources</h3>
+
+    <div id="sources">
+        No sources yet.
+    </div>
+
+
+    <script>
+
+        function askQuestion() {
+
+            const query =
+                document.getElementById("query").value;
+
+
+            if (!query.trim()) {
+
+                document.getElementById("answer").innerText =
+                    "Please enter a question.";
+
+                return;
+            }
+
+
+            // Show processing message
+
+            document.getElementById("answer").innerText =
+                "Processing your question...";
+
+            document.getElementById("language").innerText =
+                "-";
+
+            document.getElementById("sources").innerText =
+                "Retrieving sources...";
+
+
+            fetch("/user/query", {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type": "application/json"
+
+                },
+
+                body: JSON.stringify({
+
+                    query: query
+
+                })
+
+            })
+
+
+            .then(response => response.json())
+
+
+            .then(data => {
+
+                if (data.success) {
+
+                    // Display answer
+
+                    document.getElementById("answer").innerText =
+                        data.result.answer;
+
+
+                    // Display detected language
+
+                    document.getElementById("language").innerText =
+                        data.result.language;
+
+
+                    // Display sources
+
+                    displaySources(
+                        data.result.sources
+                    );
+
+                }
+
+                else {
+
+                    document.getElementById("answer").innerText =
+                        data.message;
+
+                    document.getElementById("language").innerText =
+                        "-";
+
+                    document.getElementById("sources").innerText =
+                        "-";
+
+                }
+
+            })
+
+
+            .catch(error => {
+
+                document.getElementById("answer").innerText =
+                    "Error connecting to Flask server.";
+
+                document.getElementById("language").innerText =
+                    "-";
+
+                document.getElementById("sources").innerText =
+                    "-";
+
+                console.error(error);
+
+            });
+
+        }
+
+
+        function displaySources(sources) {
+
+            const sourcesDiv =
+                document.getElementById("sources");
+
+
+            sourcesDiv.innerHTML = "";
+
+
+            if (!sources || sources.length === 0) {
+
+                sourcesDiv.innerText =
+                    "No sources available.";
+
+                return;
+            }
+
+
+            sources.forEach((source, index) => {
+
+                const sourceDiv =
+                    document.createElement("div");
+
+
+                sourceDiv.innerText =
+                    "Source " +
+                    (index + 1) +
+                    ": " +
+                    JSON.stringify(source);
+
+
+                sourcesDiv.appendChild(sourceDiv);
+
+
+                sourcesDiv.appendChild(
+                    document.createElement("br")
+                );
+
+            });
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Government RAG Assistant - Admin</title>
+
+</head>
+
+
+<body>
+
+    <h1>Government RAG Assistant</h1>
+
+    <h2>Admin Panel</h2>
+
+
+    <!-- Documents currently stored -->
+
+    <h3>Documents Stored in the System</h3>
+
+    <ul>
+
+        {% for document in documents %}
+
+            <li>{{ document }}</li>
+
+        {% endfor %}
+
+    </ul>
+
+
+    <br>
+
+
+    <!-- Document Upload -->
+
+    <label for="document">
+
+        Select Government Document:
+
+    </label>
+
+    <br><br>
+
+
+    <input
+        type="file"
+        id="document"
+        accept=".pdf,.docx,.txt"
+    >
+
+
+    <br><br>
+
+
+    <button onclick="processDocument()">
+
+        Process Document
+
+    </button>
+
+
+    <br><br>
+
+
+    <div id="result"></div>
+
+
+    <script>
+
+        function processDocument() {
+
+            const selectedDocument =
+                document.getElementById("document").files[0];
+
+
+            if (!selectedDocument) {
+
+                document.getElementById("result").innerText =
+                    "Please select a document.";
+
+                return;
+            }
+
+
+            const formData = new FormData();
+
+            formData.append(
+                "document",
+                selectedDocument
+            );
+
+
+            fetch(
+                "/admin/process",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            )
+
+
+            .then(response => response.json())
+
+
+            .then(data => {
+
+                if (data.success) {
+
+                    document.getElementById("result").innerText =
+                    "Document processed successfully. " +
+                    "Document: " + data.result.document_name +
+                    " | Chunks created: " + data.result.chunks_created;
+
+                }
+
+                else {
+
+                    document.getElementById("result").innerText =
+                    "Document status : " + data.result.message +
+                    " | Document: " + data.result.document_name +
+                    " | Chunks created: " + data.result.chunks_created;
+
+                }
+
+            })
+
+
+            .catch(error => {
+
+                document.getElementById("result").innerText =
+                    "Error connecting to Flask server.";
+
+                console.error(error);
+
+            });
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>

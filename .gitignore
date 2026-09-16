@@ -1,0 +1,19 @@
+# Virtual environment
+.venv/
+
+# Environment variables / API keys
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# ChromaDB
+vector_db/chroma/
+chroma_db/
+
+# Uploaded government documents
+data/documents/
+
+# VS Code
+.vscode/
