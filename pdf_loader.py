@@ -23,6 +23,7 @@ def load_pdf(pdf_path):
                           "document_name" : document_name,
                           "document_path" : str(pdf_path),
                           "document_type" : "pdf",
+                          "text_source" : "pdf_text"
                     })
             
         else : 
@@ -40,6 +41,7 @@ def load_pdf(pdf_path):
                                       "document_name" : document_name,
                                       "document_path" : str(pdf_path),
                                       "document_type" : "pdf",
+                                      "text_source"  : "ocr"
              })
     
     print("successfully loaded pdf :",pdf_path)      

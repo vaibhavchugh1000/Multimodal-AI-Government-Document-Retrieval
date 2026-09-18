@@ -56,6 +56,8 @@ def add_documents(chunks, embeddings):
         if "paragraph_number" in chunk:
             metadata["paragraph_number"] = chunk["paragraph_number"]
 
+        if "source_text" in chunk : 
+            metadata["source_text"]=chunk["source_text"]
         metadatas.append(metadata)
 
         ids.append(chunk["chunk_id"])
