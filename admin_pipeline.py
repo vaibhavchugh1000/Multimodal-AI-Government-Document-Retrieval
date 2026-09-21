@@ -1,3 +1,5 @@
+#admin_pipeline module
+
 from pathlib import Path
 from pdf_loader import load_pdf
 from docx_loader import load_docx

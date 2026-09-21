@@ -1,3 +1,5 @@
+# chunker module
+
 def chunk_records(records, chunk_size=1000, chunk_overlap=150):
     """
     Split document records into smaller overlapping chunks

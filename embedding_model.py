@@ -1,3 +1,5 @@
+# embedding_model module
+
 from sentence_transformers import SentenceTransformer
 
 model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"

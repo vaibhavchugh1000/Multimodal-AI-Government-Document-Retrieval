@@ -33,7 +33,7 @@ def user_query_pipeline(query):
     # Step 3: Retrieve the most relevant document chunks
     retrieved_documents = retrieve_documents(
         query,
-        top_k=5
+        top_k=10
     )
 
     # Step 4: Build the prompt using the query and

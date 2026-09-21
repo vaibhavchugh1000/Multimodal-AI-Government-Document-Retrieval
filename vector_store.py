@@ -1,3 +1,5 @@
+# vectore_store module
+
 import chromadb
 
 
@@ -47,7 +49,8 @@ def add_documents(chunks, embeddings):
             "document_id": chunk["document_id"],
             "document_name": chunk["document_name"],
             "document_path": chunk["document_path"],
-            "document_type": chunk["document_type"]
+            "document_type": chunk["document_type"],
+            "text_source" : chunk["text_source"]
         }
 
         if "page_number" in chunk:
@@ -56,8 +59,6 @@ def add_documents(chunks, embeddings):
         if "paragraph_number" in chunk:
             metadata["paragraph_number"] = chunk["paragraph_number"]
 
-        if "source_text" in chunk : 
-            metadata["source_text"]=chunk["source_text"]
         metadatas.append(metadata)
 
         ids.append(chunk["chunk_id"])

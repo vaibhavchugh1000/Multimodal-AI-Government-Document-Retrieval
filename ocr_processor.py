@@ -1,3 +1,5 @@
+# ocr_processor module
+
 import pymupdf
 import pytesseract
 from PIL import Image

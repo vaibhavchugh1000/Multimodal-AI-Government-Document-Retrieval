@@ -1,18 +1,24 @@
 from vector_store import collection
 
 
-# Get a few records from ChromaDB
 results = collection.get(
-    limit=5,
+    where={
+        "document_id": "scanned_test_document"
+    },
     include=["documents", "metadatas"]
 )
 
 
-print("\n========== CHROMADB METADATA TEST ==========\n")
+print("\n========== OCR CHROMADB METADATA TEST ==========\n")
+
+print("Number of records found:", len(results["ids"]))
 
 for i, metadata in enumerate(results["metadatas"]):
 
-    print(f"Record {i + 1}")
+    print("\n-----------------------------------")
+    print("Record:", i + 1)
     print("Metadata:", metadata)
     print("Text source:", metadata.get("text_source"))
-    print("-----------------------------------")
+
+    print("\nStored text:")
+    print(results["documents"][i])

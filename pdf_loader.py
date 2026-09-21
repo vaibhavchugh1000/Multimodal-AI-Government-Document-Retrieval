@@ -1,3 +1,5 @@
+# pdf_loader module
+
 from pypdf import PdfReader
 from pathlib import Path
 from ocr_processor import ocr_image , ocr_pdf_page
@@ -17,6 +19,7 @@ def load_pdf(pdf_path):
         
         if text and text.strip():
             
+            print("in PDF_TEXT branch")
             pages.append({"text" : text,
                           "page_number" : page_number,
                           "document_id" : document_id,
@@ -28,6 +31,7 @@ def load_pdf(pdf_path):
             
         else : 
             
+            print("in OCR branch")
             # Scanned/image-based PDF page
             ocr_text = ocr_pdf_page(
                 pdf_path,
