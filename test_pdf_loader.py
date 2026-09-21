@@ -1,23 +1,22 @@
 from pdf_loader import load_pdf
-from source_checker import containsScannedpages
-import os
-from pathlib import Path
 
-pdf_paths = os.listdir("data/documents")
 
-scanned_pdfs=list()
-for pdf_path in pdf_paths : 
-    
-    value=containsScannedpages("data/documents/"+pdf_path)
-    
-    if value :
-        scanned_pdfs.append(Path(pdf_path).stem)
-        
-print("names of scanned pdfs : ")
-for scanned_pdf in scanned_pdfs : 
-    
-    print(scanned_pdf)
-    
-print("count of scanned pdfs = ",len(scanned_pdfs))
+pdf_path = "data/documents/scanned_test_document.pdf"
 
-    
+pages = load_pdf(pdf_path)
+
+
+print("\n========== PDF LOADER RESULT ==========\n")
+
+for page in pages:
+
+    print("Page:", page["page_number"])
+    print("Document:", page["document_name"])
+    print("Text Source:", page["text_source"])
+    print("Has Images:", page["has_images"])
+    print("Image Count:", page["image_count"])
+
+    print("\nExtracted Text:")
+    print(page["text"])
+
+    print("\n--------------------------------------\n")
