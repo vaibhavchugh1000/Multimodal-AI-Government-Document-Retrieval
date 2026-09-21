@@ -2,7 +2,7 @@ from ocr_processor import ocr_pdf_page
 
 
 # Path to the PDF we want to test
-pdf_path = "data/documents/citizen-charter-2024-25-1.pdf"
+pdf_path = "data/documents/scanned_test_document.pdf"
 
 
 # Perform OCR on the first page
