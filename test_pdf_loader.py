@@ -1,26 +1,29 @@
 from pdf_loader import load_pdf
 
 
-pdf_path = "data/documents/doc202112201.pdf"
+PDF_PATH = r"data/documents/EAadhaar_VaibhavChugh.pdf"
 
-pages = load_pdf(pdf_path)
 
-"""
+pages = load_pdf(PDF_PATH)
 
-print("\n========== PDF LOADER RESULT ==========\n")
+
+print("\n========================================")
+print("PDF LOADER TEST COMPLETED")
+print("========================================")
+
+print("Total pages:", len(pages))
 
 
 for page in pages:
 
+    print("\n----------------------------------------")
     print("Page:", page["page_number"])
-    print("Document:", page["document_name"])
-    print("Text Source:", page["text_source"])
-    print("Has Images:", page["has_images"])
-    print("Image Count:", page["image_count"])
+    print("Page type:", page["page_type"])
+    print("Text source:", page["text_source"])
+    print("Has images:", page["has_images"])
+    print("Image count:", page["image_count"])
+    print("Drawing count:", page["drawing_count"])
+    print("Text length:", len(page["text"]))
 
-    print("\nExtracted Text:")
-    print(page["text"])
-
-    print("\n--------------------------------------\n")
-    
-"""
+    print("\nText preview:")
+    print(page["text"][:500])
