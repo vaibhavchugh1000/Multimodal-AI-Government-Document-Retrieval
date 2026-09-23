@@ -22,7 +22,7 @@ def ocr_pdf_page(pdf_path, page_number=0, dpi=300):
     document = pymupdf.open(pdf_path)
 
     try:
-
+        
         page = document[page_number]
 
         pixmap = page.get_pixmap(dpi=dpi)
@@ -35,4 +35,4 @@ def ocr_pdf_page(pdf_path, page_number=0, dpi=300):
 
     finally:
 
-        document.close()
+      document.close()
