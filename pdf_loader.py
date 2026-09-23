@@ -4,7 +4,7 @@ from pathlib import Path
 import pymupdf
 
 from ocr_processor import ocr_image, ocr_pdf_page
-
+from page_classifier import inspect_page , classify_page
 
 def load_pdf(pdf_path):
 
@@ -19,6 +19,19 @@ def load_pdf(pdf_path):
 
         text = page.get_text().strip()
         images = page.get_images(full=True)
+        
+        page_info=inspect_page(page)
+        
+        page_type=classify_page(page_info)
+        
+        
+        print(
+        f"Page {page_number}: ",
+        f"page_type = {page_type}",
+        f"text={page_info['text_present']}, "
+        f"images={page_info['image_count']}, "
+        f"drawings={page_info['drawing_count']}"
+        )
 
         # Case 1: Page has native text and images
         if text and images:
