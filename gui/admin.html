@@ -1,146 +1,810 @@
+```html
 <!DOCTYPE html>
-<html>
-
+<html lang="en" data-theme="light">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Government RAG Assistant | Admin</title>
 
-    <title>Government RAG Assistant - Admin</title>
+<style>
+:root {
+    color-scheme: light;
+    --bg: #f2f6fc;
+    --surface: #fff;
+    --surface2: #f8faff;
+    --text: #17263d;
+    --muted: #687991;
+    --border: #dfe7f1;
+    --primary: #1769d2;
+    --soft: #eaf3ff;
+    --danger: #b42318;
+    --success: #16845b;
+    --shadow: 0 8px 28px #1a355510;
+}
 
+[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0b1422;
+    --surface: #121f30;
+    --surface2: #17283d;
+    --text: #edf4ff;
+    --muted: #a7b7cc;
+    --border: #2a3d54;
+    --primary: #4c9aff;
+    --soft: #1b3452;
+    --danger: #ff9c96;
+    --success: #5ed4a3;
+    --shadow: 0 8px 28px #0003;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.6 Inter, ui-sans-serif, system-ui,
+          -apple-system, "Segoe UI", sans-serif;
+}
+
+header {
+    min-height: 70px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 clamp(16px, 4vw, 48px);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 800;
+    font-size: 17px;
+}
+
+.logo {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    background: var(--soft);
+    color: var(--primary);
+    display: grid;
+    place-items: center;
+    font-size: 20px;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.muted {
+    color: var(--muted);
+}
+
+.theme, .linkbtn {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    padding: 9px 12px;
+    border-radius: 9px;
+    cursor: pointer;
+    font-weight: 650;
+    text-decoration: none;
+    font: inherit;
+}
+
+main {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 34px 22px 56px;
+}
+
+.heading {
+    margin-bottom: 24px;
+}
+
+.eyebrow {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--primary);
+}
+
+h1 {
+    font-size: 30px;
+    letter-spacing: -.8px;
+    margin: 5px 0;
+}
+
+h2 {
+    font-size: 17px;
+    margin: 0;
+}
+
+.desc {
+    color: var(--muted);
+    font-size: 13px;
+    margin: 4px 0 18px;
+}
+
+.card, .stat {
+    min-width: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    padding: 22px;
+}
+
+.cardhead {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 8px;
+}
+
+.icon {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    background: var(--soft);
+    color: var(--primary);
+    display: grid;
+    place-items: center;
+    font-size: 19px;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.stat {
+    padding: 17px 20px;
+}
+
+.small {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.statnum {
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.columns {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 18px;
+    align-items: stretch;
+}
+
+.btn {
+    border: 0;
+    border-radius: 9px;
+    padding: 11px 16px;
+    background: var(--primary);
+    color: #fff;
+    font: inherit;
+    font-weight: 750;
+    cursor: pointer;
+    transition: opacity .2s, transform .2s;
+}
+
+.btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.btn:disabled {
+    opacity: .6;
+    cursor: wait;
+}
+
+.secondary {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+/* Upload area */
+
+.upload-form {
+    width: 100%;
+}
+
+.drop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    width: 100%;
+    min-height: 190px;
+    padding: 24px 16px;
+
+    border: 2px dashed #91b8ec;
+    border-radius: 13px;
+    background: var(--surface2);
+    text-align: center;
+    cursor: pointer;
+
+    transition: background .2s, border-color .2s;
+}
+
+.drop:hover,
+.drop.drag {
+    background: var(--soft);
+    border-color: var(--primary);
+}
+
+.drop:focus-within {
+    outline: 3px solid color-mix(in srgb, var(--primary) 25%, transparent);
+}
+
+.upload-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 15px;
+    display: grid;
+    place-items: center;
+    background: var(--soft);
+    color: var(--primary);
+    font-size: 27px;
+    margin-bottom: 3px;
+}
+
+.drop strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 750;
+    color: var(--text);
+}
+
+.drop .small {
+    display: block;
+    line-height: 1.7;
+}
+
+.file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    clip-path: inset(50%);
+    border: 0;
+}
+
+.filelabel {
+    display: block;
+    margin: 12px 0 0;
+    padding: 10px 12px;
+    border-radius: 9px;
+    background: var(--surface2);
+    color: var(--muted);
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
+.filelabel.selected {
+    color: var(--primary);
+    font-weight: 650;
+}
+
+.buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+/* Result messages */
+
+.status {
+    font-size: 13px;
+    margin-top: 14px;
+    overflow-wrap: anywhere;
+}
+
+#result {
+    display: none;
+    padding: 12px 14px;
+    border-radius: 10px;
+    margin-top: 14px;
+    overflow-wrap: anywhere;
+}
+
+#result.show {
+    display: block;
+}
+
+#result.success {
+    color: var(--success);
+    background: color-mix(in srgb, var(--success) 10%, var(--surface));
+    border: 1px solid color-mix(in srgb, var(--success) 25%, var(--border));
+}
+
+#result.error {
+    color: var(--danger);
+    background: color-mix(in srgb, var(--danger) 8%, var(--surface));
+    border: 1px solid color-mix(in srgb, var(--danger) 25%, var(--border));
+}
+
+/* Document list */
+
+.search {
+    margin: 8px 0 12px;
+}
+
+input[type="search"] {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    font: inherit;
+    color: var(--text);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 13px;
+    outline: none;
+}
+
+input[type="search"]:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent);
+}
+
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+li.doc {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 12px 3px;
+    border-bottom: 1px solid var(--border);
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+li.doc:last-child {
+    border-bottom: 0;
+}
+
+.docicon {
+    color: var(--primary);
+    flex-shrink: 0;
+}
+
+.empty {
+    padding: 18px;
+    background: var(--surface2);
+    border-radius: 10px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.footnote {
+    margin-top: 18px;
+    padding: 13px 15px;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+@media (max-width: 800px) {
+    .columns {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 720px) {
+    main {
+        padding: 24px 14px;
+    }
+
+    header {
+        padding: 12px 14px;
+    }
+
+    .brand {
+        font-size: 14px;
+    }
+
+    .role {
+        display: none;
+    }
+
+    .card {
+        padding: 17px;
+    }
+
+    h1 {
+        font-size: 27px;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .buttons {
+        flex-direction: column;
+    }
+
+    .buttons button {
+        width: 100%;
+    }
+
+    .drop {
+        min-height: 170px;
+        padding: 20px 12px;
+    }
+}
+</style>
 </head>
-
 
 <body>
 
-    <h1>Government RAG Assistant</h1>
+<header>
+    <div class="brand">
+        <div class="logo">▤</div>
+        Government RAG Assistant
+    </div>
 
-    <h2>Admin Panel</h2>
+    <div class="actions">
+        <span class="muted role">Administrator</span>
+        <button class="theme" id="themeToggle" type="button">☾ Dark mode</button>
+        <a class="linkbtn" href="/">Sign out</a>
+    </div>
+</header>
 
+<main>
+    <section class="heading">
+        <div>
+            <div class="eyebrow">Knowledge management</div>
+            <h1>Admin dashboard</h1>
+            <p class="desc">Upload and manage documents used by the retrieval system.</p>
+        </div>
+    </section>
 
-    <!-- Documents currently stored -->
+    <section class="stats">
+        <div class="stat">
+            <div class="small">Documents listed</div>
+            <div class="statnum" id="documentCount">{{ documents|length }}</div>
+        </div>
 
-    <h3>Documents Stored in the System</h3>
+        <div class="stat">
+            <div class="small">Supported formats</div>
+            <div class="statnum">3</div>
+            <div class="small">PDF · DOCX · TXT</div>
+        </div>
+    </section>
 
-    <ul>
+    <section class="columns">
 
-        {% for document in documents %}
+        <!-- Upload document -->
+        <article class="card">
+            <div class="cardhead">
+                <div class="icon">↑</div>
+                <h2>Upload government document</h2>
+            </div>
 
-            <li>{{ document }}</li>
+            <p class="desc">
+                Add a document to the knowledge base for processing and retrieval.
+            </p>
 
-        {% endfor %}
+            <form id="uploadForm" class="upload-form">
+                <label class="drop" id="dropzone" for="document">
+                    <span class="upload-icon" aria-hidden="true">⇧</span>
+                    <strong>Choose a file to upload</strong>
+                    <span class="small">Click to browse or drag and drop</span>
+                    <span class="small">Supported formats: PDF, DOCX, TXT</span>
+                </label>
 
-    </ul>
+                <input
+                    class="file-input"
+                    type="file"
+                    id="document"
+                    name="document"
+                    accept=".pdf,.docx,.txt"
+                    aria-label="Choose a government document"
+                >
 
+                <div class="filelabel" id="selectedFile" aria-live="polite">
+                    No file selected.
+                </div>
 
-    <br>
+                <div class="buttons">
+                    <button class="btn" id="processButton" type="submit">
+                        Process document →
+                    </button>
 
+                    <button class="btn secondary" id="clearButton" type="button">
+                        Clear
+                    </button>
+                </div>
+            </form>
 
-    <!-- Document Upload -->
+            <div id="result" role="status" aria-live="polite"></div>
+        </article>
 
-    <label for="document">
+        <!-- Document list -->
+        <article class="card">
+            <div class="cardhead">
+                <div class="icon">▤</div>
+                <h2>Documents in the system</h2>
+            </div>
 
-        Select Government Document:
+            <p class="desc">
+                Documents currently reported by the application.
+            </p>
 
-    </label>
+            <input
+                class="search"
+                id="searchDocuments"
+                type="search"
+                placeholder="Search documents…"
+                aria-label="Search documents"
+            >
 
-    <br><br>
+            <ul id="documentList">
+                {% for document in documents %}
+                <li class="doc" data-document-name="{{ document|string|e }}">
+                    <span class="docicon" aria-hidden="true">▧</span>
+                    <span>{{ document }}</span>
+                </li>
+                {% else %}
+                <li class="empty-row">
+                    <div class="empty">No documents are listed yet. Upload one to get started.</div>
+                </li>
+                {% endfor %}
+            </ul>
 
+            <div class="empty" id="noMatches" hidden>
+                No documents match your search.
+            </div>
+        </article>
+    </section>
 
-    <input
-        type="file"
-        id="document"
-        accept=".pdf,.docx,.txt"
-    >
+    <div class="footnote">
+        Tip: OCR is used for image-based PDF content. Processing time depends on the document and its pages.
+    </div>
+</main>
 
+<script>
+const root = document.documentElement;
+const themeToggle = document.getElementById("themeToggle");
 
-    <br><br>
+function applyTheme(theme) {
+    root.dataset.theme = theme;
 
+    try {
+        localStorage.setItem("grag-theme", theme);
+    } catch (_) {}
 
-    <button onclick="processDocument()">
+    themeToggle.textContent =
+        theme === "dark" ? "☀ Light mode" : "☾ Dark mode";
+}
 
-        Process Document
+let savedTheme = "light";
 
-    </button>
+try {
+    savedTheme = localStorage.getItem("grag-theme") || "light";
+} catch (_) {}
 
+applyTheme(savedTheme);
 
-    <br><br>
+themeToggle.addEventListener("click", () => {
+    applyTheme(root.dataset.theme === "dark" ? "light" : "dark");
+});
 
+const input = document.getElementById("document");
+const selected = document.getElementById("selectedFile");
+const drop = document.getElementById("dropzone");
+const box = document.getElementById("result");
+const btn = document.getElementById("processButton");
+const clearButton = document.getElementById("clearButton");
 
-    <div id="result"></div>
+function showFile() {
+    if (input.files.length) {
+        selected.textContent = "Selected: " + input.files[0].name;
+        selected.classList.add("selected");
+    } else {
+        selected.textContent = "No file selected.";
+        selected.classList.remove("selected");
+    }
+}
 
+input.addEventListener("change", showFile);
 
-    <script>
+function showResult(message, type) {
+    box.textContent = message;
+    box.className = "show" + (type ? " " + type : "");
+}
 
-        function processDocument() {
+function clearUpload() {
+    input.value = "";
+    showFile();
+    box.className = "";
+    box.textContent = "";
+}
 
-            const selectedDocument =
-                document.getElementById("document").files[0];
+clearButton.addEventListener("click", clearUpload);
 
+/* Drag-and-drop support */
+["dragenter", "dragover"].forEach(type => {
+    drop.addEventListener(type, event => {
+        event.preventDefault();
+        event.stopPropagation();
+        drop.classList.add("drag");
+    });
+});
 
-            if (!selectedDocument) {
+["dragleave", "drop"].forEach(type => {
+    drop.addEventListener(type, event => {
+        event.preventDefault();
+        event.stopPropagation();
+        drop.classList.remove("drag");
+    });
+});
 
-                document.getElementById("result").innerText =
-                    "Please select a document.";
+drop.addEventListener("drop", event => {
+    const files = event.dataTransfer.files;
 
-                return;
-            }
+    if (!files.length) return;
 
+    try {
+        input.files = files;
+        showFile();
 
-            const formData = new FormData();
+        if (input.files.length) {
+            box.className = "";
+            box.textContent = "";
+        }
+    } catch (_) {
+        showResult("Could not select the dropped file. Please browse for it instead.", "error");
+    }
+});
 
-            formData.append(
-                "document",
-                selectedDocument
+/* Process the document through the existing Flask endpoint */
+document.getElementById("uploadForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const file = input.files[0];
+
+    if (!file) {
+        showResult("Please select a document first.", "error");
+        return;
+    }
+
+    const extension = file.name.split(".").pop().toLowerCase();
+
+    if (!["pdf", "docx", "txt"].includes(extension)) {
+        showResult("Unsupported file type. Select PDF, DOCX or TXT.", "error");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("document", file);
+
+    btn.disabled = true;
+    clearButton.disabled = true;
+    btn.textContent = "Processing…";
+
+    showResult(
+        "Uploading and processing the document. This may take a little while…",
+        ""
+    );
+
+    try {
+        const response = await fetch("/admin/process", {
+            method: "POST",
+            body: formData
+        });
+
+        let data;
+
+        try {
+            data = await response.json();
+        } catch (_) {
+            throw new Error(
+                "Unexpected server response (HTTP " + response.status +
+                "). Check the Flask terminal for details."
             );
-
-
-            fetch(
-                "/admin/process",
-                {
-                    method: "POST",
-                    body: formData
-                }
-            )
-
-
-            .then(response => response.json())
-
-
-            .then(data => {
-
-                if (data.success) {
-
-                    document.getElementById("result").innerText =
-                    "Document processed successfully. " +
-                    "Document: " + data.result.document_name +
-                    " | Chunks created: " + data.result.chunks_created;
-
-                }
-
-                else {
-
-                    document.getElementById("result").innerText =
-                    "Document status : " + data.result.message +
-                    " | Document: " + data.result.document_name +
-                    " | Chunks created: " + data.result.chunks_created;
-
-                }
-
-            })
-
-
-            .catch(error => {
-
-                document.getElementById("result").innerText =
-                    "Error connecting to Flask server.";
-
-                console.error(error);
-
-            });
-
         }
 
-    </script>
+        if (!response.ok || !data.success) {
+            const message =
+                data.message ||
+                (data.result && data.result.message) ||
+                "The document could not be processed.";
 
+            showResult(message, "error");
+            return;
+        }
+
+        const result = data.result || {};
+        const documentName = result.document_name || file.name;
+        const chunksCreated =
+            result.chunks_created ?? "not reported";
+
+        showResult(
+            "Document processed successfully: " +
+            documentName +
+            ". Chunks created: " +
+            chunksCreated +
+            ". Refreshing document list…",
+            "success"
+        );
+
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
+
+    } catch (error) {
+        showResult(
+            error.message || "Could not connect to Flask. Check the server.",
+            "error"
+        );
+    } finally {
+        btn.disabled = false;
+        clearButton.disabled = false;
+        btn.textContent = "Process document →";
+    }
+});
+
+/* Search the displayed document list */
+const search = document.getElementById("searchDocuments");
+const rows = [
+    ...document.querySelectorAll("#documentList li[data-document-name]")
+];
+const noMatches = document.getElementById("noMatches");
+
+search.addEventListener("input", () => {
+    let visibleCount = 0;
+    const term = search.value.trim().toLowerCase();
+
+    rows.forEach(row => {
+        const matches =
+            row.dataset.documentName.toLowerCase().includes(term);
+
+        row.hidden = !matches;
+
+        if (matches) visibleCount++;
+    });
+
+    noMatches.hidden = visibleCount !== 0 || rows.length === 0;
+});
+</script>
 
 </body>
-
 </html>
+```
