@@ -1,7 +1,7 @@
 from pdf_loader import load_pdf
 
 
-PDF_PATH = r"data/documents/EAadhaar_VaibhavChugh.pdf"
+PDF_PATH = r"data/documents/doc202112201.pdf"
 
 
 pages = load_pdf(PDF_PATH)
@@ -16,6 +16,8 @@ print("Total pages:", len(pages))
 
 for page in pages:
 
+    print()
+    print()
     print("\n----------------------------------------")
     print("Page:", page["page_number"])
     print("Page type:", page["page_type"])
@@ -24,6 +26,5 @@ for page in pages:
     print("Image count:", page["image_count"])
     print("Drawing count:", page["drawing_count"])
     print("Text length:", len(page["text"]))
-
-    print("\nText preview:")
-    print(page["text"][:500])
+    print("text : ",page["text"])
+    

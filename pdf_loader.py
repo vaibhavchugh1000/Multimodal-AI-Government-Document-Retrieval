@@ -64,12 +64,9 @@ def load_pdf(pdf_path : str) :
     pages=list()
     document_name=Path(pdf_path).name
     document_id=Path(pdf_path).stem
-    count=0
+    
     for (page_number,page) in enumerate(document,start=1) : 
-        
-        
-        if count==6: 
-            break
+            
         # --------------------------------------------------
         # 1. Inspect page
         # --------------------------------------------------
@@ -167,9 +164,9 @@ def load_pdf(pdf_path : str) :
 
             "page_type": page_type
         })
-        print(pages[-1])
+        
+        
         print()
-        count=count+1
 
     document.close()
 
