@@ -1,147 +1,470 @@
+
 <!DOCTYPE html>
-<html>
-
+<html lang="en" data-theme="light">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Government RAG Assistant | Sign in</title>
 
-    <title>Government RAG Assistant - Login</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --bg: #f2f6fc;
+            --surface: #ffffff;
+            --surface2: #f8faff;
+            --text: #17263d;
+            --muted: #687991;
+            --border: #dfe7f1;
+            --primary: #1769d2;
+            --soft: #eaf3ff;
+            --danger: #b42318;
+            --success: #16845b;
+            --shadow: 0 12px 35px #1a355512;
+        }
 
+        [data-theme="dark"] {
+            color-scheme: dark;
+            --bg: #0b1422;
+            --surface: #121f30;
+            --surface2: #17283d;
+            --text: #edf4ff;
+            --muted: #a7b7cc;
+            --border: #2a3d54;
+            --primary: #4c9aff;
+            --soft: #1b3452;
+            --danger: #ff9c96;
+            --success: #5ed4a3;
+            --shadow: 0 12px 35px #0003;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 76px 20px 30px;
+            display: grid;
+            place-items: center;
+            background: var(--bg);
+            color: var(--text);
+            font: 14px/1.6 Inter, system-ui, -apple-system,
+                  "Segoe UI", sans-serif;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 22px;
+            padding: 9px 13px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            background: var(--surface);
+            color: var(--text);
+            font: inherit;
+            font-weight: 650;
+            cursor: pointer;
+        }
+
+        .shell {
+            width: min(100%, 920px);
+            min-height: 530px;
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .hero {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 44px;
+            color: #ffffff;
+            background: linear-gradient(
+                145deg, #103766, #1769d2 75%, #0c2a4e
+            );
+        }
+
+        .seal {
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            border: 1px solid #ffffff75;
+            border-radius: 14px;
+            font-size: 24px;
+        }
+
+        .hero h1 {
+            margin: 24px 0 14px;
+            font-size: 38px;
+            line-height: 1.12;
+            letter-spacing: -0.8px;
+        }
+
+        .hero p {
+            max-width: 290px;
+            color: #dceaff;
+        }
+
+        .herofoot {
+            color: #c7dcf8;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        .formwrap {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: clamp(28px, 6vw, 62px);
+        }
+
+        .eyebrow {
+            color: var(--primary);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+        }
+
+        .formwrap h2 {
+            margin: 6px 0;
+            font-size: 30px;
+            letter-spacing: -0.7px;
+        }
+
+        .desc {
+            margin: 4px 0 18px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        label {
+            display: block;
+            margin: 17px 0 7px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        input {
+            display: block;
+            width: 100%;
+            min-height: 46px;
+            padding: 12px 13px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            outline: none;
+            background: var(--surface2);
+            color: var(--text);
+            font: inherit;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px
+                color-mix(in srgb, var(--primary) 15%, transparent);
+        }
+
+        .btn {
+            width: 100%;
+            margin-top: 23px;
+            padding: 12px 16px;
+            border: 0;
+            border-radius: 9px;
+            background: var(--primary);
+            color: #ffffff;
+            font: inherit;
+            font-weight: 750;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            filter: brightness(1.06);
+        }
+
+        .btn:disabled {
+            opacity: 0.65;
+            cursor: wait;
+        }
+
+        #result {
+            min-height: 22px;
+            margin-top: 12px;
+            font-size: 13px;
+            overflow-wrap: anywhere;
+        }
+
+        .hint {
+            margin-top: 18px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--soft);
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .hint strong {
+            color: var(--text);
+        }
+
+        code {
+            color: var(--primary);
+        }
+
+        .footer {
+            margin-top: 24px;
+            color: var(--muted);
+            font-size: 11px;
+            text-align: center;
+        }
+
+        @media (max-width: 680px) {
+            body {
+                padding: 76px 14px 20px;
+            }
+
+            .shell {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                min-height: 220px;
+                padding: 26px;
+            }
+
+            .hero h1 {
+                margin: 15px 0 8px;
+                font-size: 29px;
+            }
+
+            .herofoot {
+                margin-top: 20px;
+            }
+
+            .formwrap {
+                padding: 28px;
+            }
+
+            .theme-toggle {
+                top: 14px;
+                right: 14px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                transition: none !important;
+            }
+        }
+    </style>
 </head>
-
 
 <body>
 
-    <h1>Government RAG Assistant</h1>
-
-    <h2>Login</h2>
-
-
-    <label for="userId">
-        ID:
-    </label>
-
-    <br><br>
-
-    <input
-        type="text"
-        id="userId"
-        placeholder="Enter ID"
+    <button
+        class="theme-toggle"
+        id="themeToggle"
+        type="button"
+        aria-label="Toggle colour theme"
     >
-
-
-    <br><br>
-
-
-    <label for="password">
-        Password:
-    </label>
-
-    <br><br>
-
-    <input
-        type="password"
-        id="password"
-        placeholder="Enter Password"
-    >
-
-
-    <br><br>
-
-
-    <button onclick="login()">
-        Login
+        ☾ Dark mode
     </button>
 
+    <main class="shell">
 
-    <br><br>
+        <section class="hero">
+            <div>
+                <div class="seal">▤</div>
 
+                <h1>
+                    Government<br>
+                    RAG Assistant
+                </h1>
 
-    <div id="result"></div>
+                <p>
+                    Find information in government documents with
+                    AI-powered search and retrieval.
+                </p>
+            </div>
 
+            <div class="herofoot">
+                DIGITAL DOCUMENT INTELLIGENCE · GOVERNMENT INFORMATION
+            </div>
+        </section>
+
+        <section class="formwrap">
+
+            <div class="eyebrow">Secure workspace</div>
+
+            <h2>Welcome back</h2>
+
+            <p class="desc">
+                Sign in to continue to your workspace.
+            </p>
+
+            <form id="loginForm">
+
+                <label for="userId">User ID</label>
+
+                <input
+                    id="userId"
+                    name="userId"
+                    type="text"
+                    autocomplete="username"
+                    placeholder="Enter your ID"
+                    required
+                >
+
+                <label for="password">Password</label>
+
+                <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    autocomplete="current-password"
+                    placeholder="Enter your password"
+                    required
+                >
+
+                <button
+                    class="btn"
+                    id="loginButton"
+                    type="submit"
+                >
+                    Sign in →
+                </button>
+
+            </form>
+
+            <div
+                id="result"
+                role="status"
+                aria-live="polite"
+            ></div>
+
+            <div class="hint">
+                <strong>Demo access</strong><br>
+                Admin: <code>admin</code> / <code>admin</code><br>
+                User: <code>user</code> / <code>user</code>
+            </div>
+
+            <div class="footer">
+                Government RAG Assistant · AI-assisted document retrieval
+            </div>
+
+        </section>
+
+    </main>
 
     <script>
+        const root = document.documentElement;
+        const themeToggle = document.getElementById("themeToggle");
 
-        function login() {
+        function applyTheme(theme) {
+            root.dataset.theme = theme;
 
-            const userId =
-                document.getElementById("userId").value;
+            themeToggle.textContent =
+                theme === "dark"
+                    ? "☀ Light mode"
+                    : "☾ Dark mode";
 
-            const password =
-                document.getElementById("password").value;
+            themeToggle.setAttribute(
+                "aria-label",
+                theme === "dark"
+                    ? "Switch to light mode"
+                    : "Switch to dark mode"
+            );
 
-
-            if (!userId || !password) {
-
-                document.getElementById("result").innerText =
-                    "Please enter ID and password.";
-
-                return;
+            try {
+                localStorage.setItem("grag-theme", theme);
+            } catch (error) {
+                // Theme still works for this page if storage is unavailable.
             }
-
-
-            fetch("/login", {
-
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify({
-
-                    id: userId,
-
-                    password: password
-
-                })
-
-            })
-
-
-            .then(response => response.json())
-
-
-            .then(data => {
-
-                if (data.success) {
-
-                    if (data.role === "admin") {
-
-                        window.location.href = "/admin";
-
-                    }
-
-                    else if (data.role === "user") {
-
-                        window.location.href = "/user";
-
-                    }
-
-                }
-
-                else {
-
-                    document.getElementById("result").innerText =
-                        data.message;
-
-                }
-
-            })
-
-
-            .catch(error => {
-
-                document.getElementById("result").innerText =
-                    "Error connecting to Flask server.";
-
-                console.error(error);
-
-            });
-
         }
 
+        let savedTheme = "light";
+
+        try {
+            savedTheme = localStorage.getItem("grag-theme") || "light";
+        } catch (error) {
+            // Use the default light theme.
+        }
+
+        applyTheme(savedTheme);
+
+        themeToggle.addEventListener("click", () => {
+            applyTheme(
+                root.dataset.theme === "dark" ? "light" : "dark"
+            );
+        });
+
+        document
+            .getElementById("loginForm")
+            .addEventListener("submit", async event => {
+                event.preventDefault();
+
+                const result = document.getElementById("result");
+                const button = document.getElementById("loginButton");
+
+                const userId =
+                    document.getElementById("userId").value.trim();
+
+                const password =
+                    document.getElementById("password").value;
+
+                result.textContent = "";
+                result.style.color = "var(--danger)";
+
+                button.disabled = true;
+                button.textContent = "Signing in…";
+
+                try {
+                    const response = await fetch("/login", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            id: userId,
+                            password: password
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok || !data.success) {
+                        throw new Error(
+                            data.message || "Unable to sign in."
+                        );
+                    }
+
+                    if (data.role === "admin") {
+                        window.location.href = "/admin";
+                    } else if (data.role === "user") {
+                        window.location.href = "/user";
+                    } else {
+                        throw new Error("Unknown user role.");
+                    }
+
+                } catch (error) {
+                    result.textContent =
+                        error.message ||
+                        "Could not connect to Flask. Check that the server is running.";
+
+                } finally {
+                    button.disabled = false;
+                    button.textContent = "Sign in →";
+                }
+            });
     </script>
 
-
 </body>
-
 </html>
