@@ -1,3 +1,5 @@
+# prompt_builder module
+
 from language_detector import detect_language
 
 def build_prompt(query, retrieved_documents,language):
@@ -38,7 +40,7 @@ def build_prompt(query, retrieved_documents,language):
 
         text = document["text"]
         metadata = document["metadata"]
-
+            
         document_name = metadata.get(
             "document_name",
             "Unknown document"

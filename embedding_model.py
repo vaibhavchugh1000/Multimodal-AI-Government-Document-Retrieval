@@ -14,4 +14,8 @@ def create_embeddings(texts):
     embeddings=model.encode(texts,convert_to_numpy=True,show_progress_bar=True)
     
     print("embeddings created successfully")
+    print("Number of input texts:", len(texts))
+    print("Number of embeddings:", len(embeddings))
+    print("Embedding shape:", embeddings.shape)
+    
     return embeddings
