@@ -40,4 +40,8 @@ def chunk_records(records, chunk_size=1000, chunk_overlap=150):
             start = end - chunk_overlap
 
     print("chunks created successfully")
+    
+    #for chunk in chunks:
+    #print("chunk text : ",chunk["text"])
+        
     return chunks

@@ -46,7 +46,8 @@ def retrieve_documents(query, top_k):
             "text": document,
             "metadata": metadata,
             "chunk_id": chunk_id,
-            "distance": distance
+            "distance": distance,
+            "evidence_id": f"E{len(retrieved_documents) + 1:03d}"
         })
 
     return retrieved_documents

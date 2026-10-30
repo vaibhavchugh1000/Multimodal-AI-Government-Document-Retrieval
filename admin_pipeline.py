@@ -63,6 +63,7 @@ def process_document(document_path):
                 print("Has images:", record["has_images"])
                 print("Image count:", record["image_count"])
                 print("Drawing count:", record["drawing_count"])
+                print("page text : ",record["text"])
                 
     cleaned_records=clean_records(records)
     try :

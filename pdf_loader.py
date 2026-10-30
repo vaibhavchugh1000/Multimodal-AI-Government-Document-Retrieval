@@ -119,6 +119,7 @@ def load_pdf(pdf_path : str) :
             
             # complex page 
             text_source="pdf_text+page_vision"
+            
             pixmap=page.get_pixmap(dpi=200)
             image_bytes=pixmap.tobytes("png")
             
@@ -166,7 +167,22 @@ def load_pdf(pdf_path : str) :
         })
         
         
-        print()
+        for page in pages :
+            
+             print("page_number : ",page["page_number"])
+             print("page_type : ",page["page_type"])
+             print("text_source : ",page["text_source"])
+             print("has_images : ",page["has_images"])
+             print("image_count : ",page["image_count"])
+             print("drawing_count : ",page["drawing_count"])
+             print("text : ",page["text"][:1000])
+             print("document_type : ",page["document_type"])
+             print("document_name : ",page["document_name"])
+             print("document_path : ",page["document_path"])
+             print("document_id : ",page["document_id"])
+             print()
+             print()
+             
 
     document.close()
 

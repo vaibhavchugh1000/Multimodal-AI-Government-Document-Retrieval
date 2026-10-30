@@ -1,3 +1,5 @@
+#prompt_builder.py module
+
 from language_detector import detect_language
 
 def build_prompt(query, retrieved_documents,language):

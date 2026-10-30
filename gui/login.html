@@ -198,7 +198,24 @@
             min-height: 22px;
             margin-top: 12px;
             font-size: 13px;
+            line-height: 1.5;
             overflow-wrap: anywhere;
+        }
+
+        #result.error {
+            padding: 11px 13px;
+            border: 1px solid #fecdca;
+            border-radius: 9px;
+            color: var(--danger);
+            background: #fef3f2;
+        }
+
+        #result.success {
+            padding: 11px 13px;
+            border: 1px solid #abefc6;
+            border-radius: 9px;
+            color: var(--success);
+            background: #ecfdf3;
         }
 
         .hint {
@@ -406,64 +423,75 @@
             );
         });
 
-        document
-            .getElementById("loginForm")
-            .addEventListener("submit", async event => {
-                event.preventDefault();
+        const form = document.getElementById("loginForm");
+        const result = document.getElementById("result");
+        const button = document.getElementById("loginButton");
 
-                const result = document.getElementById("result");
-                const button = document.getElementById("loginButton");
+        form.addEventListener("submit", async event => {
+            event.preventDefault();
 
-                const userId =
-                    document.getElementById("userId").value.trim();
+            const userId = document.getElementById("userId").value.trim();
+            const password = document.getElementById("password").value;
 
-                const password =
-                    document.getElementById("password").value;
+            if (!userId || !password) {
+                showMessage("Please enter your user ID and password.", "error");
+                return;
+            }
 
-                result.textContent = "";
-                result.style.color = "var(--danger)";
+            button.disabled = true;
+            button.textContent = "Signing in…";
+            result.textContent = "";
+            result.className = "";
 
-                button.disabled = true;
-                button.textContent = "Signing in…";
+            try {
+                const response = await fetch("/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: userId, password })
+                });
 
+                let data;
                 try {
-                    const response = await fetch("/login", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            id: userId,
-                            password: password
-                        })
-                    });
-
-                    const data = await response.json();
-
-                    if (!response.ok || !data.success) {
-                        throw new Error(
-                            data.message || "Unable to sign in."
-                        );
-                    }
-
-                    if (data.role === "admin") {
-                        window.location.href = "/admin";
-                    } else if (data.role === "user") {
-                        window.location.href = "/user";
-                    } else {
-                        throw new Error("Unknown user role.");
-                    }
-
-                } catch (error) {
-                    result.textContent =
-                        error.message ||
-                        "Could not connect to Flask. Check that the server is running.";
-
-                } finally {
-                    button.disabled = false;
-                    button.textContent = "Sign in →";
+                    data = await response.json();
+                } catch (_) {
+                    throw new Error("The server returned an unreadable response.");
                 }
-            });
+
+                if (!response.ok || !data.success) {
+                    throw new Error(
+                        data.message || "Unable to sign in. Check your credentials and try again."
+                    );
+                }
+
+                if (data.role === "admin") {
+                    showMessage("Sign-in successful. Redirecting…", "success");
+                    window.location.href = "/admin";
+                } else if (data.role === "user") {
+                    showMessage("Sign-in successful. Redirecting…", "success");
+                    window.location.href = "/user";
+                } else {
+                    throw new Error(
+                        "Your account role could not be identified. Please contact the administrator."
+                    );
+                }
+
+            } catch (error) {
+                showMessage(
+                    error.message || "Could not connect to the server. Please check that the application is running.",
+                    "error"
+                );
+                console.error(error);
+            } finally {
+                button.disabled = false;
+                button.textContent = "Sign in →";
+            }
+        });
+
+        function showMessage(message, type) {
+            result.textContent = message;
+            result.className = type || "";
+        }
+
     </script>
 
 </body>
