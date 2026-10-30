@@ -8,6 +8,7 @@ import pytesseract
 from PIL import Image
 
 
+
 def ocr_image(image_bytes):
 
     image = Image.open(io.BytesIO(image_bytes))

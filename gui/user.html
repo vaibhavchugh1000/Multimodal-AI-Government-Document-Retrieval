@@ -5,9 +5,16 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Government RAG Assistant | Citizen</title>
 
+<!-- KaTeX stylesheet for mathematical expressions -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+
 <!-- Markdown renderer and HTML sanitizer -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
+
+<!-- KaTeX libraries for rendering mathematical expressions -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 
 <style>
 :root {
@@ -222,6 +229,52 @@ input:focus,textarea:focus {
     min-height:54px;
 }
 
+.feedback-panel {
+    margin-top:20px;
+    padding-top:16px;
+    border-top:1px solid var(--border);
+}
+.feedback-question {
+    font-weight:700;
+    margin-bottom:10px;
+}
+.feedback-buttons {
+    display:flex;
+    flex-wrap:wrap;
+    gap:9px;
+}
+.feedback-btn {
+    border:1px solid var(--border);
+    background:var(--surface2);
+    color:var(--text);
+    border-radius:9px;
+    padding:9px 12px;
+    cursor:pointer;
+    font:inherit;
+    font-weight:650;
+}
+.feedback-btn:hover:not(:disabled),
+.feedback-btn.selected {
+    border-color:var(--primary);
+    background:var(--soft);
+}
+.feedback-btn:disabled {
+    opacity:.65;
+    cursor:default;
+}
+.feedback-comment {
+    margin-top:12px;
+    min-height:76px;
+}
+.feedback-status {
+    margin-top:9px;
+    font-size:13px;
+    color:var(--muted);
+}
+.feedback-status.success { color:var(--success); }
+.feedback-status.error { color:var(--danger); }
+.feedback-panel[hidden] { display:none; }
+
 .source-list {
     display:grid;
     gap:10px;
@@ -426,6 +479,21 @@ input:focus,textarea:focus {
             </div>
             <p class="desc">Response generated from retrieved document context.</p>
             <div class="answer markdown-body placeholder" id="answer">Your answer will appear here after you ask a question.</div>
+
+            <div class="feedback-panel" id="feedbackPanel" hidden>
+                <div class="feedback-question">Was this answer helpful?</div>
+                <div class="feedback-buttons">
+                    <button class="feedback-btn" id="helpfulButton" type="button">👍 Helpful</button>
+                    <button class="feedback-btn" id="notHelpfulButton" type="button">👎 Not helpful</button>
+                </div>
+                <label for="feedbackComment" class="source-detail" style="display:block;margin-top:12px">
+                    Optional: tell us what could be improved
+                </label>
+                <textarea id="feedbackComment" class="feedback-comment" maxlength="1000"
+                    placeholder="For example, the answer missed an important detail…"></textarea>
+                <button class="feedback-btn" id="saveCommentButton" type="button" disabled style="margin-top:8px">Save comment</button>
+                <div class="feedback-status" id="feedbackStatus" role="status" aria-live="polite"></div>
+            </div>
         </article>
 
         <article class="card">
@@ -487,9 +555,128 @@ const sources = document.getElementById("sources");
 const status = document.getElementById("status");
 const button = document.getElementById("askButton");
 
+const feedbackPanel = document.getElementById("feedbackPanel");
+const helpfulButton = document.getElementById("helpfulButton");
+const notHelpfulButton = document.getElementById("notHelpfulButton");
+const feedbackComment = document.getElementById("feedbackComment");
+const saveCommentButton = document.getElementById("saveCommentButton");
+const feedbackStatus = document.getElementById("feedbackStatus");
+
+let currentInteractionId = null;
+let ratingSaved = false;
+let commentSaved = false;
+
 query.addEventListener("input", () => {
     counter.textContent = query.value.length;
 });
+
+function resetFeedback() {
+    currentInteractionId = null;
+    ratingSaved = false;
+    commentSaved = false;
+    feedbackPanel.hidden = true;
+    feedbackComment.value = "";
+    feedbackStatus.textContent = "";
+    feedbackStatus.className = "feedback-status";
+    helpfulButton.disabled = false;
+    notHelpfulButton.disabled = false;
+    saveCommentButton.disabled = true;
+    helpfulButton.classList.remove("selected");
+    notHelpfulButton.classList.remove("selected");
+}
+
+async function sendFeedback(rating, clickedButton) {
+    if (!Number.isInteger(currentInteractionId) || currentInteractionId <= 0) {
+        feedbackStatus.textContent = "This answer cannot be rated yet. Please ask again.";
+        feedbackStatus.className = "feedback-status error";
+        return;
+    }
+
+    if (ratingSaved) {
+        feedbackStatus.textContent = "A rating has already been saved for this answer.";
+        feedbackStatus.className = "feedback-status";
+        return;
+    }
+
+    helpfulButton.disabled = true;
+    notHelpfulButton.disabled = true;
+    feedbackStatus.textContent = "Saving rating…";
+    feedbackStatus.className = "feedback-status";
+
+    try {
+        const response = await fetch("/feedback", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                interaction_id: currentInteractionId,
+                rating: rating
+            })
+        });
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.error || "Unable to save rating.");
+        }
+
+        ratingSaved = true;
+        clickedButton.classList.add("selected");
+        saveCommentButton.disabled = false;
+        feedbackStatus.textContent = "Rating saved. You can optionally add a comment below.";
+        feedbackStatus.className = "feedback-status success";
+    } catch (error) {
+        helpfulButton.disabled = false;
+        notHelpfulButton.disabled = false;
+        feedbackStatus.textContent = error.message || "Could not save rating. Please try again.";
+        feedbackStatus.className = "feedback-status error";
+    }
+}
+
+async function saveComment() {
+    if (!ratingSaved) {
+        feedbackStatus.textContent = "Please save a Helpful or Not helpful rating first.";
+        feedbackStatus.className = "feedback-status error";
+        return;
+    }
+
+    const comment = feedbackComment.value.trim();
+    if (!comment) {
+        feedbackStatus.textContent = "Enter a comment before saving it.";
+        feedbackStatus.className = "feedback-status error";
+        return;
+    }
+
+    saveCommentButton.disabled = true;
+    feedbackStatus.textContent = "Saving comment…";
+    feedbackStatus.className = "feedback-status";
+
+    try {
+        const response = await fetch("/feedback/comment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                interaction_id: currentInteractionId,
+                comment: comment
+            })
+        });
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.error || "Unable to save comment.");
+        }
+
+        commentSaved = true;
+        feedbackStatus.textContent = "Comment saved successfully.";
+        feedbackStatus.className = "feedback-status success";
+    } catch (error) {
+        saveCommentButton.disabled = false;
+        feedbackStatus.textContent = error.message || "Could not save comment. Please try again.";
+        feedbackStatus.className = "feedback-status error";
+    }
+}
+
+helpfulButton.addEventListener("click", () => sendFeedback(1, helpfulButton));
+notHelpfulButton.addEventListener("click", () => sendFeedback(-1, notHelpfulButton));
+saveCommentButton.addEventListener("click", saveComment);
+
+resetFeedback();
 
 function display(value, fallback) {
     if (value === null || value === undefined || value === "") {
@@ -521,6 +708,19 @@ function renderMarkdown(element, text) {
         });
 
         element.innerHTML = window.DOMPurify.sanitize(html);
+
+        // Render mathematical expressions using KaTeX
+        if (window.renderMathInElement) {
+            renderMathInElement(element, {
+                delimiters: [
+                    { left: "$$", right: "$$", display: true },
+                    { left: "$", right: "$", display: false },
+                    { left: "\\[", right: "\\]", display: true },
+                    { left: "\\(", right: "\\)", display: false }
+                ],
+                throwOnError: false
+            });
+        }
     } else {
         element.textContent = value;
     }
@@ -601,6 +801,7 @@ document.getElementById("queryForm").addEventListener("submit", async event => {
         return;
     }
 
+    resetFeedback();
     button.disabled = true;
     button.textContent = "Searching…";
 
@@ -640,6 +841,14 @@ document.getElementById("queryForm").addEventListener("submit", async event => {
         }
 
         const result = data.result || {};
+
+        if (Number.isInteger(data.interaction_id) && data.interaction_id > 0) {
+            currentInteractionId = data.interaction_id;
+            feedbackPanel.hidden = false;
+        } else {
+            currentInteractionId = null;
+            feedbackPanel.hidden = true;
+        }
 
         // Render Markdown instead of displaying literal ** markers.
         renderMarkdown(
