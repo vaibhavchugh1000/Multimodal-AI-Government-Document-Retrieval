@@ -106,15 +106,189 @@ body{margin:0;background:var(--bg);color:var(--text);font:14px/1.6 Inter,ui-sans
 .footer{text-align:center;color:var(--muted);font-size:11px;padding:12px 0 0}
 @media(max-width:1050px){.layout{grid-template-columns:205px minmax(0,1fr)}.source-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.content{padding:28px 24px}.topbar{padding:10px 24px}}
 @media(max-width:720px){.layout{display:block}.sidebar{min-height:auto;padding:14px 16px}.brand{padding:0 4px 12px}.nav-label,.sidebar-bottom{display:none}.nav-link{display:inline-flex;margin:0 4px 0 0;padding:9px 11px;font-size:12px}.topbar{min-height:54px;padding:9px 18px}.content{padding:24px 15px}.page-heading h1{font-size:22px}.heading-icon{width:48px;height:48px}.question-card,.answer-card{padding:19px}.source-grid{grid-template-columns:1fr}.top-right{gap:8px}.theme{padding:7px 8px}}
+
+/* Government-inspired visual identity */
+:root {
+    --gov-navy:#0b2f63;
+    --gov-saffron:#f29a1a;
+    --gov-green:#16834b;
+}
+.sidebar {
+    background:linear-gradient(180deg,#092b59 0%,#061f43 100%);
+    border-right:4px solid var(--gov-saffron);
+    position:relative;
+}
+.sidebar:after {
+    content:"";
+    position:absolute;
+    left:0;right:0;bottom:0;height:7px;
+    background:linear-gradient(to bottom,var(--gov-saffron) 0 33%,#fff 33% 66%,var(--gov-green) 66% 100%);
+}
+.brand-icon {
+    border-radius:50% !important;
+    background:#ffffff18 !important;
+    border:1px solid #ffffff55 !important;
+}
+.topbar {
+    border-top:4px solid var(--gov-saffron);
+    position:relative;
+}
+.topbar:after {
+    content:"";
+    position:absolute;left:0;right:0;bottom:-2px;height:2px;
+    background:var(--gov-green);
+}
+.page-heading h1 { color:var(--gov-navy); }
+.round-icon,.heading-icon { border-radius:12px; }
+.primary { background:var(--gov-navy); }
+.primary:hover { background:#164987; }
+.nav-link.active { box-shadow:inset 4px 0 var(--gov-saffron); }
+.gov-disclaimer {
+    margin:18px 0 0;padding:10px 13px;border:1px solid var(--border);
+    border-left:4px solid var(--gov-green);border-radius:9px;
+    color:var(--muted);font-size:11px;background:var(--surface);
+}
+/* Feedback UI: visual prototype only; no backend calls are made. */
+.feedback-panel {
+    margin-top:22px;padding:17px 0 0;border-top:1px solid var(--border);
+}
+.feedback-question {font-weight:800;color:var(--ink);margin-bottom:11px}
+.feedback-buttons {display:flex;gap:10px;flex-wrap:wrap}
+.feedback-btn {
+    border:1px solid var(--border);background:var(--surface2);color:var(--text);
+    border-radius:9px;padding:9px 14px;cursor:pointer;font:inherit;font-size:12px;font-weight:700;
+}
+.feedback-btn:hover:not(:disabled),.feedback-btn.selected {
+    border-color:var(--primary);background:var(--soft);
+}
+.feedback-btn:disabled {opacity:.6;cursor:default}
+.feedback-btn.positive {color:var(--success)}
+.feedback-btn.negative {color:var(--danger)}
+.feedback-thanks {
+    display:none;margin-top:12px;padding:11px 13px;border-radius:9px;
+    background:var(--success-bg);color:var(--success);font-weight:750;font-size:13px;
+}
+.feedback-thanks.visible {display:block}
+.feedback-modal-backdrop {
+    position:fixed;inset:0;z-index:1000;background:#07172dcc;
+    display:none;align-items:center;justify-content:center;padding:18px;
+}
+.feedback-modal-backdrop.visible {display:flex}
+.feedback-modal {
+    width:min(100%,520px);max-height:min(90vh,720px);overflow:auto;
+    background:var(--surface);color:var(--text);border:1px solid var(--border);
+    border-radius:15px;box-shadow:0 24px 70px #0005;padding:20px;
+}
+.feedback-modal-head {display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
+.feedback-modal-head h3 {margin:0;font-size:17px;color:var(--ink)}
+.feedback-close {
+    border:0;background:transparent;color:var(--muted);font-size:23px;cursor:pointer;
+}
+.feedback-modal p {font-size:12px;color:var(--muted);margin:0 0 12px}
+.feedback-reasons {display:grid;gap:9px;margin:13px 0}
+.feedback-reason {display:flex;align-items:flex-start;gap:9px;font-size:13px}
+.feedback-reason input {width:auto;margin:2px 0 0;accent-color:var(--primary)}
+.feedback-comment-label {display:block;font-size:12px;font-weight:750;margin:14px 0 6px}
+.feedback-comment {
+    width:100%;min-height:94px;resize:vertical;padding:11px 12px;
+    border:1px solid var(--border);border-radius:9px;background:var(--surface2);
+    color:var(--text);font:inherit;font-size:12px;
+}
+.feedback-modal-footer {display:flex;justify-content:flex-end;gap:9px;margin-top:15px}
+.feedback-counter {font-size:11px;color:var(--muted);text-align:right;margin-top:4px}
+.feedback-note {font-size:10px;color:var(--muted);margin-top:10px}
+@media(max-width:720px) {
+    .feedback-buttons {flex-direction:column;align-items:stretch}
+    .feedback-modal-footer button {flex:1}
+}
+
+
+.masthead{background:var(--surface);border-bottom:1px solid var(--line)}
+.masthead-inner{min-height:94px;display:flex;align-items:center;gap:22px;padding:14px clamp(16px,3vw,42px)}
+.brand-mark{width:58px;height:58px;flex:0 0 58px;border:1px solid #c8d5e7;border-radius:50%;display:grid;place-items:center;color:var(--navy);background:var(--soft)}
+.brand-mark svg{width:42px;height:42px}
+.brand-copy{border-right:1px solid var(--line);padding-right:22px}
+.brand-copy strong{display:block;font-size:17px;color:var(--navy);line-height:1.25}
+.brand-copy span{font-size:11px;color:var(--muted)}
+.product-title{min-width:0;flex:1}
+.product-title h1{font-size:clamp(18px,2.2vw,27px);line-height:1.2;margin:0;color:var(--navy);letter-spacing:-.5px}
+.product-title p{margin:5px 0 0;color:var(--muted);font-size:13px}
+.masthead-art{width:180px;max-width:20%;height:58px;color:#a8bfdc;display:flex;align-items:center;justify-content:center}
+.tricolor{height:8px;background:linear-gradient(to bottom,var(--saffron) 0 33%,#fff 33% 66%,var(--green) 66% 100%);border-top:1px solid #e8edf4;border-bottom:1px solid #dce5ef}
+
+/* Match the Admin GUI's shared government portal navigation styling */
+.sidebar {
+    background:linear-gradient(180deg,#082b59,#061f43);
+    color:#fff;
+    padding:22px 15px 18px;
+    display:flex;
+    flex-direction:column;
+    min-height:calc(100vh - 102px);
+    border:0;
+}
+.brand-icon {
+    border-radius:50%;
+    background:#ffffff18;
+    border:1px solid #ffffff55;
+}
+.nav-link.active { box-shadow:inset 3px 0 #fbbf24; }
+.topbar {
+    height:66px;
+    min-height:66px;
+    background:var(--surface);
+    border-top:0;
+    border-bottom:1px solid var(--border);
+    padding:0 clamp(16px,3vw,38px);
+}
+.topbar:after { content:none; }
+.page-heading h1 { color:var(--ink); }
+.primary { background:#123e76; }
+.gov-footer-accent {
+    height:5px;
+    background:linear-gradient(to right,#f59e0b 0 33%,#fff 33% 66%,#16834b 66% 100%);
+    border-radius:99px;
+    margin-top:16px;
+}
+@media(max-width:720px) {
+    .masthead-inner { min-height:70px; gap:10px; padding:10px 14px; }
+    .brand-copy { display:none; }
+    .brand-mark { width:42px; height:42px; flex-basis:42px; }
+    .brand-mark svg { width:32px; height:32px; }
+    .product-title h1 { font-size:16px; }
+    .product-title p { font-size:10px; }
+    .masthead-art { display:none; }
+}
 </style>
 </head>
 <body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="brand-mark" aria-hidden="true">
+      <!-- Project-created Ashoka Chakra motif; not an official Government emblem. -->
+      <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3">
+        <circle cx="50" cy="50" r="35"/><circle cx="50" cy="50" r="5"/>
+        <g stroke-width="2"><path d="M50 15V85M15 50H85M25.3 25.3L74.7 74.7M74.7 25.3L25.3 74.7M36.6 16.1L63.4 83.9M16.1 36.6L83.9 63.4M63.4 16.1L36.6 83.9M16.1 63.4L83.9 36.6"/></g>
+      </svg>
+    </div>
+    <div class="brand-copy"><strong>भारत सरकार शैली</strong><span>Government-inspired project interface</span></div>
+    <div class="product-title"><h1>Government Document RAG Assistant</h1><p>Intelligent Retrieval of Government Documents</p></div>
+    <div class="masthead-art" aria-hidden="true">
+      <svg viewBox="0 0 190 65" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M8 54H182M20 52V34H170V52M30 34Q95 -3 160 34M39 34V52M55 29V52M72 24V52M95 20V52M118 24V52M135 29V52M151 34V52M15 55H175"/>
+        <path d="M95 9V2M95 2L104 5L95 8" stroke="#f59e0b"/>
+      </svg>
+    </div>
+  </div>
+  <div class="tricolor"></div>
+</header>
+
 <div class="layout">
     <aside class="sidebar">
         <div class="brand"><span class="brand-icon">⌕</span><span>GovDoc <b>AI</b></span></div>
         <div class="nav-label">Workspace</div>
         <a class="nav-link active" href="/user"><span class="nav-icon">▤</span>Citizen Assistant</a>
-        <a class="nav-link" href="/admin"><span class="nav-icon">▣</span>Admin Dashboard</a>
+        
         <div class="sidebar-bottom"><span class="secure-dot">●</span>Answers grounded in your indexed documents.</div>
     </aside>
 
@@ -171,8 +345,21 @@ body{margin:0;background:var(--bg);color:var(--text);font:14px/1.6 Inter,ui-sans
                     <div class="source-title"><span>▤</span> Sources <span id="sourceLabel" style="color:var(--muted);font-weight:500">(0)</span></div>
                     <div id="sources" class="source-grid"><div class="empty-sources">Sources used to generate the answer will appear here.</div></div>
                 </div>
+
+                <div class="feedback-panel" id="feedbackPanel">
+                    <div class="feedback-question">Was this answer helpful?</div>
+                    <div class="feedback-buttons">
+                        <button class="feedback-btn positive" id="helpfulFeedback" type="button">👍 Helpful</button>
+                        <button class="feedback-btn negative" id="notHelpfulFeedback" type="button">👎 Not helpful</button>
+                    </div>
+                    <div class="feedback-thanks" id="feedbackThanks" role="status" aria-live="polite">
+                        ✓ Thank you for your feedback!
+                    </div>
+                    <div class="feedback-note">Your feedback helps improve the quality of this assistant. This is a visual prototype; responses are not submitted or stored.</div>
+                </div>
             </section>
-            <div class="footer">GovDoc AI · Government Document RAG Assistant</div>
+            <div class="gov-footer-accent" aria-hidden="true"></div>
+            <div class="footer">Government Document RAG Assistant · Citizen Portal</div>
         </div>
     </main>
 </div>
@@ -426,6 +613,7 @@ async function askQuestion(event) {
         return;
     }
 
+    resetFeedbackVisual();
     askButton.disabled = true;
     askButton.textContent = "Searching documents…";
     showMessage("Searching the knowledge base and preparing an answer…", "info");
@@ -475,6 +663,92 @@ async function askQuestion(event) {
         askButton.innerHTML = '<span aria-hidden="true">➤</span> Ask question';
     }
 }
+
+// Feedback wireframe interactions only: no fetch(), Flask route, or database integration.
+const helpfulFeedback = document.getElementById("helpfulFeedback");
+const notHelpfulFeedback = document.getElementById("notHelpfulFeedback");
+const feedbackThanks = document.getElementById("feedbackThanks");
+const feedbackBackdrop = document.getElementById("feedbackModalBackdrop");
+const feedbackComment = document.getElementById("feedbackComment");
+const feedbackCharCount = document.getElementById("feedbackCharCount");
+const closeFeedbackModal = document.getElementById("closeFeedbackModal");
+const cancelFeedback = document.getElementById("cancelFeedback");
+const submitFeedbackVisual = document.getElementById("submitFeedbackVisual");
+
+function closeFeedbackDialog() {
+    feedbackBackdrop.classList.remove("visible");
+    feedbackBackdrop.setAttribute("aria-hidden", "true");
+}
+function resetFeedbackVisual() {
+    helpfulFeedback.disabled = false;
+    notHelpfulFeedback.disabled = false;
+    helpfulFeedback.classList.remove("selected");
+    notHelpfulFeedback.classList.remove("selected");
+    feedbackThanks.classList.remove("visible");
+    feedbackComment.value = "";
+    feedbackCharCount.textContent = "0";
+    feedbackBackdrop.querySelectorAll('input[type="checkbox"]').forEach(input => input.checked = false);
+    closeFeedbackDialog();
+}
+helpfulFeedback.addEventListener("click", () => {
+    helpfulFeedback.disabled = true;
+    notHelpfulFeedback.disabled = true;
+    helpfulFeedback.classList.add("selected");
+    feedbackThanks.textContent = "✓ Thank you for your feedback!";
+    feedbackThanks.classList.add("visible");
+});
+notHelpfulFeedback.addEventListener("click", () => {
+    feedbackBackdrop.classList.add("visible");
+    feedbackBackdrop.setAttribute("aria-hidden", "false");
+    feedbackComment.focus();
+});
+feedbackComment.addEventListener("input", () => {
+    feedbackCharCount.textContent = String(feedbackComment.value.length);
+});
+closeFeedbackModal.addEventListener("click", closeFeedbackDialog);
+cancelFeedback.addEventListener("click", closeFeedbackDialog);
+feedbackBackdrop.addEventListener("click", event => {
+    if (event.target === feedbackBackdrop) closeFeedbackDialog();
+});
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && feedbackBackdrop.classList.contains("visible")) closeFeedbackDialog();
+});
+submitFeedbackVisual.addEventListener("click", () => {
+    closeFeedbackDialog();
+    helpfulFeedback.disabled = true;
+    notHelpfulFeedback.disabled = true;
+    notHelpfulFeedback.classList.add("selected");
+    feedbackThanks.textContent = "✓ Thank you for your feedback!";
+    feedbackThanks.classList.add("visible");
+});
+
 </script>
+
+<div class="feedback-modal-backdrop" id="feedbackModalBackdrop" aria-hidden="true">
+    <section class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedbackModalTitle">
+        <div class="feedback-modal-head">
+            <h3 id="feedbackModalTitle">Share Feedback</h3>
+            <button class="feedback-close" id="closeFeedbackModal" type="button" aria-label="Close">×</button>
+        </div>
+        <p><strong>What was wrong with this answer?</strong> (Select one or more)</p>
+        <div class="feedback-reasons">
+            <label class="feedback-reason"><input type="checkbox" value="Incorrect information"> Incorrect information</label>
+            <label class="feedback-reason"><input type="checkbox" value="Incomplete answer"> Incomplete answer</label>
+            <label class="feedback-reason"><input type="checkbox" value="Irrelevant answer"> Irrelevant answer</label>
+            <label class="feedback-reason"><input type="checkbox" value="Missing source / evidence"> Missing source / evidence</label>
+            <label class="feedback-reason"><input type="checkbox" value="Difficult to understand"> Difficult to understand</label>
+            <label class="feedback-reason"><input type="checkbox" value="Outdated information"> Outdated information</label>
+            <label class="feedback-reason"><input type="checkbox" value="Other"> Other (please specify)</label>
+        </div>
+        <label class="feedback-comment-label" for="feedbackComment">Additional comment (optional)</label>
+        <textarea class="feedback-comment" id="feedbackComment" maxlength="500" placeholder="Tell us what could be improved..."></textarea>
+        <div class="feedback-counter"><span id="feedbackCharCount">0</span> / 500</div>
+        <div class="feedback-modal-footer">
+            <button class="feedback-btn" id="cancelFeedback" type="button">Cancel</button>
+            <button class="primary" id="submitFeedbackVisual" type="button">Submit Feedback</button>
+        </div>
+    </section>
+</div>
+
 </body>
 </html>

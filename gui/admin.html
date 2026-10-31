@@ -1,186 +1,335 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Admin Dashboard | GovDoc AI</title>
-  <style>
-    :root{color-scheme:light;--navy:#102a56;--blue:#1d4ed8;--blue2:#2563eb;--ink:#172b4d;--muted:#64748b;--line:#dce6f3;--bg:#f4f7fb;--white:#fff;--green:#067647;--red:#b42318;--soft:#edf4ff;--shadow:0 4px 14px #1d355708}
-    [data-theme="dark"]{color-scheme:dark;--navy:#e5efff;--blue:#75a7ff;--blue2:#8bb6ff;--ink:#e5edf9;--muted:#a9b8ce;--line:#30445f;--bg:#0b1422;--white:#121f30;--green:#5ed4a3;--red:#ff9c96;--soft:#1b3452;--shadow:0 4px 14px #0002}
-    *{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);font-size:14px}.layout{min-height:100vh;display:grid;grid-template-columns:248px minmax(0,1fr)}.sidebar{background:linear-gradient(180deg,#102a56,#122343);color:white;padding:26px 16px;display:flex;flex-direction:column;min-height:100vh}.brand{display:flex;align-items:center;gap:10px;padding:0 10px 34px;font-size:20px;font-weight:800;letter-spacing:-.5px}.brand-icon{width:38px;height:38px;display:grid;place-items:center;background:#ffffff16;border:1px solid #ffffff25;border-radius:12px;font-size:22px}.brand b{color:#fbbf24}.nav-label{padding:0 12px;margin:4px 0 10px;color:#90a8cc;font-size:10px;text-transform:uppercase;letter-spacing:1.6px;font-weight:800}.nav-link{display:flex;align-items:center;gap:12px;padding:13px 14px;margin:3px 0;border-radius:10px;color:#cbd8eb;text-decoration:none;font-weight:600}.nav-link.active{background:#ffffff19;color:white;box-shadow:inset 3px 0 #fbbf24}.nav-icon{width:20px;text-align:center;font-size:17px}.sidebar-bottom{margin-top:auto;border-top:1px solid #ffffff25;padding:18px 10px 0;color:#b8c8df;font-size:12px;line-height:1.6}.main{min-width:0}.topbar{min-height:68px;background:var(--white);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:10px 36px;gap:15px}.crumb{color:var(--muted);font-size:13px}.crumb strong{color:var(--ink)}.top-right{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:12px}.avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--soft);color:var(--blue);font-weight:800}.theme-toggle{border:1px solid var(--line);background:var(--white);color:var(--ink);padding:8px 11px;border-radius:9px;cursor:pointer;font:inherit;font-size:12px;font-weight:650}.content{max-width:1240px;margin:0 auto;padding:34px 36px 50px}.page-heading{display:flex;align-items:center;gap:16px;margin-bottom:26px}.heading-icon{width:58px;height:58px;border-radius:18px;background:#e1edff;color:#1d4ed8;display:grid;place-items:center;font-size:27px}.page-heading h1{margin:0 0 5px;font-size:27px;letter-spacing:-.8px;color:var(--navy)}.page-heading p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin-bottom:20px}.stat{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:13px;box-shadow:var(--shadow);min-width:0}.stat-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:12px;background:var(--soft);color:var(--blue);font-size:20px;flex-shrink:0}.stat-label{font-size:12px;color:var(--muted);margin-bottom:5px}.stat-value{font-size:23px;font-weight:800;color:var(--navy);letter-spacing:-.5px}.card{background:var(--white);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);margin-bottom:20px;padding:24px;min-width:0}.card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:18px}.card-header h2{font-size:17px;margin:0 0 5px;color:var(--navy)}.card-header p{margin:0;color:var(--muted);font-size:12px;line-height:1.6}.badge{background:var(--soft);color:#31568d;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:750;white-space:nowrap}.dropzone{border:1.5px dashed #b8cbe5;background:var(--bg);border-radius:13px;padding:28px 20px;text-align:center;transition:.2s}.dropzone.dragover{border-color:var(--blue);background:var(--soft)}.upload-icon{width:48px;height:48px;border-radius:15px;background:var(--soft);color:var(--blue);display:grid;place-items:center;font-size:24px;margin:0 auto 12px}.dropzone h3{font-size:14px;margin:0 0 6px;color:var(--ink)}.dropzone p{margin:0 0 16px;color:var(--muted);font-size:12px}.file-picker{max-width:100%;font:inherit;font-size:12px;color:var(--muted)}.file-name{font-size:12px;color:#31568d;margin-top:12px;overflow-wrap:anywhere}.actions{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:17px}.primary,.secondary{border-radius:10px;font-weight:750;font-size:13px;padding:12px 17px;cursor:pointer;transition:.15s}.primary{border:0;background:var(--blue);color:#fff}.primary:hover:not(:disabled){background:#1e40af;transform:translateY(-1px)}.primary:disabled,.secondary:disabled{opacity:.6;cursor:wait;transform:none}.secondary{border:1px solid var(--line);background:var(--white);color:var(--ink)}.message{display:none;margin-top:16px;padding:12px 14px;border-radius:10px;font-size:12px;line-height:1.55;overflow-wrap:anywhere}.message.error{display:block;color:var(--red);background:#fef3f2;border:1px solid #fecdca}.message.success{display:block;color:var(--green);background:#ecfdf3;border:1px solid #abefc6}.message.info{display:block;color:#31568d;background:#eff6ff;border:1px solid #bfdbfe}.search-wrap{margin:8px 0 12px}.search{display:block;width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;font-size:13px;outline:none}.search:focus{border-color:var(--blue);box-shadow:0 0 0 3px #2563eb20}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:500px}th{text-align:left;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#8191a8;background:var(--bg);padding:12px 14px;border-bottom:1px solid var(--line)}td{padding:14px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}tbody tr:last-child td{border-bottom:0}.doc-name{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--ink);overflow-wrap:anywhere}.doc-icon{height:32px;width:29px;flex-shrink:0;border-radius:6px;background:#fff0f0;color:#d92d20;display:grid;place-items:center;font-size:9px;font-weight:900;border:1px solid #ffd5d2}.status-pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;background:#ecfdf3;color:#067647;padding:6px 9px;font-size:10px;font-weight:750}.status-dot{width:6px;height:6px;background:#12b76a;border-radius:50%}.empty{text-align:center;padding:28px 15px;color:var(--muted);font-size:12px}.footer{text-align:center;color:#9aa8bb;font-size:11px;padding:12px 0 0}.footnote{margin-top:2px;padding:13px 15px;border:1px solid var(--line);border-radius:11px;color:var(--muted);font-size:12px;background:var(--white)}[hidden]{display:none!important}
-    @media(max-width:1000px){.layout{grid-template-columns:205px minmax(0,1fr)}.content{padding:28px 24px}.topbar{padding:10px 24px}}@media(max-width:720px){.layout{display:block}.sidebar{min-height:auto;padding:14px 16px}.brand{padding:0 4px 12px}.nav-label,.sidebar-bottom{display:none}.nav-link{display:inline-flex;margin:0 4px 0 0;padding:9px 11px;font-size:12px}.topbar{min-height:54px;padding:9px 18px}.content{padding:24px 15px}.page-heading h1{font-size:22px}.heading-icon{width:48px;height:48px}.stats{grid-template-columns:1fr}.card{padding:18px}.card-header{flex-direction:column}.actions{justify-content:stretch}.actions button{flex:1}.top-right{gap:8px}.top-right>span:first-child{display:none}}@media(max-width:480px){.actions{flex-direction:column}.actions button{width:100%}.dropzone{padding:22px 12px}}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Government Document RAG Assistant | Admin Portal</title>
+<style>
+:root{
+  color-scheme:light;--navy:#082b59;--navy2:#123e76;--ink:#14294a;
+  --muted:#64748b;--line:#d9e4f1;--bg:#f2f6fc;--surface:#fff;
+  --soft:#eaf2fc;--blue:#1457a6;--saffron:#f59e0b;--green:#16834b;
+  --red:#b42318;--shadow:0 8px 24px #12345a12;
+}
+[data-theme="dark"]{
+  color-scheme:dark;--navy:#e6efff;--navy2:#b9d2f4;--ink:#e8f0fc;
+  --muted:#a8b8ce;--line:#30445f;--bg:#0b1422;--surface:#121f30;
+  --soft:#1b3452;--blue:#78adff;--saffron:#f7b84b;--green:#5ed4a3;
+  --red:#ff9c96;--shadow:0 8px 24px #0003;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+.masthead{background:var(--surface);border-bottom:1px solid var(--line)}
+.masthead-inner{min-height:94px;display:flex;align-items:center;gap:22px;padding:14px clamp(16px,3vw,42px)}
+.brand-mark{width:58px;height:58px;flex:0 0 58px;border:1px solid #c8d5e7;border-radius:50%;display:grid;place-items:center;color:var(--navy);background:var(--soft)}
+.brand-mark svg{width:42px;height:42px}
+.brand-copy{border-right:1px solid var(--line);padding-right:22px}
+.brand-copy strong{display:block;font-size:17px;color:var(--navy);line-height:1.25}
+.brand-copy span{font-size:11px;color:var(--muted)}
+.product-title{min-width:0;flex:1}
+.product-title h1{font-size:clamp(18px,2.2vw,27px);line-height:1.2;margin:0;color:var(--navy);letter-spacing:-.5px}
+.product-title p{margin:5px 0 0;color:var(--muted);font-size:13px}
+.masthead-art{width:180px;max-width:20%;height:58px;color:#a8bfdc;display:flex;align-items:center;justify-content:center}
+.tricolor{height:8px;background:linear-gradient(to bottom,var(--saffron) 0 33%,#fff 33% 66%,var(--green) 66% 100%);border-top:1px solid #e8edf4;border-bottom:1px solid #dce5ef}
+.layout{min-height:calc(100vh - 102px);display:grid;grid-template-columns:250px minmax(0,1fr)}
+.sidebar{background:linear-gradient(180deg,#082b59,#061f43);color:#fff;padding:22px 15px 18px;display:flex;flex-direction:column;min-height:calc(100vh - 102px)}
+.side-brand{text-align:center;padding:4px 8px 20px;border-bottom:1px solid #ffffff35;margin-bottom:20px}
+.side-brand svg{width:48px;height:38px;display:block;margin:0 auto 8px;color:#fff}
+.side-brand strong{font-size:17px}
+.nav-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#a9bfdc;font-weight:800;padding:0 12px;margin:0 0 8px}
+.nav-link{display:flex;align-items:center;gap:12px;padding:12px 13px;margin:3px 0;border-radius:9px;text-decoration:none;color:#e4edf9;font-weight:650;border-left:4px solid transparent}
+.nav-link:hover,.nav-link.active{background:#ffffff1c;color:#fff}
+.nav-link.active{border-left-color:#fbbf24}
+.nav-icon{width:22px;text-align:center;font-size:18px}
+.sidebar-bottom{margin-top:auto;border-top:1px solid #ffffff35;padding:17px 10px 0;color:#b9cbe2;font-size:11px}
+.main{min-width:0}
+.topbar{height:66px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,3vw,38px);gap:12px}
+.breadcrumb{color:var(--muted);font-size:12px}
+.breadcrumb strong{color:var(--ink)}
+.top-actions{display:flex;align-items:center;gap:12px}
+.theme-toggle{border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);padding:8px 11px;cursor:pointer;font:inherit;font-size:12px;font-weight:650}
+.admin-chip{display:flex;align-items:center;gap:9px;font-weight:700}
+.avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--soft);color:var(--blue);font-weight:800}
+.content{max-width:1500px;margin:0 auto;padding:28px clamp(16px,3vw,38px) 42px}
+.page-heading{display:flex;align-items:center;gap:15px;margin-bottom:22px}
+.heading-accent{width:8px;height:58px;border-radius:8px;background:linear-gradient(var(--saffron) 0 50%,var(--green) 50%);flex:0 0 8px}
+.page-heading h2{font-size:27px;letter-spacing:-.6px;color:var(--navy);margin:0 0 3px}
+.page-heading p{margin:0;color:var(--muted);font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin-bottom:20px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:17px 19px;display:flex;align-items:center;gap:13px;box-shadow:var(--shadow);min-width:0}
+.stat:nth-child(1){border-left:4px solid #2563eb}.stat:nth-child(2){border-left:4px solid var(--green)}.stat:nth-child(3){border-left:4px solid #7c3aed}
+.stat-icon{width:44px;height:44px;border-radius:12px;background:var(--soft);display:grid;place-items:center;font-size:21px;flex:0 0 44px}
+.stat-label{font-size:12px;color:var(--muted);margin-bottom:3px}
+.stat-value{font-size:24px;font-weight:800;color:var(--navy);line-height:1.2}
+.stat-note{font-size:11px;color:var(--muted);margin-top:3px}
+.workspace{display:grid;grid-template-columns:minmax(300px,.88fr) minmax(0,1.35fr);gap:17px;align-items:stretch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:21px;box-shadow:var(--shadow);min-width:0}
+.card-header{display:flex;align-items:flex-start;gap:11px;margin-bottom:15px}
+.card-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:var(--soft);color:var(--blue);font-size:19px;flex:0 0 34px}
+.card-header h3{font-size:17px;color:var(--navy);margin:0 0 3px}
+.card-header p{font-size:12px;color:var(--muted);margin:0}
+.format-badge{margin-left:auto;background:var(--soft);color:var(--blue);padding:6px 9px;border-radius:99px;font-size:10px;font-weight:800;white-space:nowrap}
+.dropzone{border:2px dashed #9bbbe2;background:var(--bg);border-radius:13px;min-height:205px;padding:23px 15px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;transition:.2s}
+.dropzone.dragover{border-color:var(--blue);background:var(--soft)}
+.upload-symbol{width:55px;height:55px;border-radius:16px;background:var(--soft);color:var(--blue);display:grid;place-items:center;font-size:28px;margin-bottom:9px}
+.dropzone strong{font-size:15px;color:var(--ink)}
+.dropzone p{font-size:12px;color:var(--muted);margin:4px 0 12px}
+.file-picker{max-width:100%;font:inherit;font-size:12px;color:var(--muted)}
+.file-name{margin-top:11px;color:var(--blue);font-size:12px;overflow-wrap:anywhere}
+.actions{display:flex;gap:10px;justify-content:center;margin-top:15px}
+.primary,.secondary{border-radius:9px;padding:11px 16px;font:inherit;font-size:12px;font-weight:750;cursor:pointer}
+.primary{border:0;background:var(--navy2);color:#fff}
+.primary:hover:not(:disabled){filter:brightness(1.12)}
+.secondary{border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.primary:disabled,.secondary:disabled{opacity:.6;cursor:wait}
+.message{display:none;margin-top:14px;padding:11px 13px;border-radius:9px;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.message.error{display:block;color:var(--red);background:#b4231810;border:1px solid #b4231830}
+.message.success{display:block;color:var(--green);background:#16834b12;border:1px solid #16834b35}
+.message.info{display:block;color:var(--blue);background:var(--soft);border:1px solid var(--line)}
+.search-wrap{margin:0 0 12px}
+.search{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);font:inherit;font-size:12px;outline:none}
+.search:focus{border-color:var(--blue);box-shadow:0 0 0 3px #2563eb20}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:460px}
+th{text-align:left;background:var(--soft);color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.7px;padding:11px 10px;border-bottom:1px solid var(--line)}
+td{padding:12px 10px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}
+tbody tr:last-child td{border-bottom:0}
+.doc-name{font-weight:700;color:var(--ink);overflow-wrap:anywhere;display:flex;align-items:center;gap:8px}
+.doc-icon{min-width:31px;height:29px;padding:0 4px;border-radius:6px;background:#fff0f0;color:#b42318;border:1px solid #ffd5d2;display:grid;place-items:center;font-size:9px;font-weight:900}
+.status-pill{display:inline-flex;align-items:center;gap:6px;border-radius:99px;background:#16834b16;color:var(--green);padding:5px 8px;font-size:10px;font-weight:750;white-space:nowrap}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+.empty{text-align:center;padding:25px 12px;color:var(--muted);font-size:12px}
+.footnote{margin-top:17px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--muted);font-size:11px}
+.footer{text-align:center;color:var(--muted);font-size:10px;padding:17px 0 0}
+[hidden]{display:none!important}
+@media(max-width:1050px){.layout{grid-template-columns:210px minmax(0,1fr)}.workspace{grid-template-columns:1fr}.masthead-art{display:none}}
+@media(max-width:720px){.layout{display:block}.sidebar{min-height:auto;padding:12px}.side-brand{padding:0 0 10px;margin-bottom:10px}.side-brand svg{display:none}.nav-label,.sidebar-bottom{display:none}.nav-link{display:inline-flex;padding:8px 10px;margin:2px;font-size:11px}.topbar{height:56px}.content{padding-top:21px}.page-heading h2{font-size:22px}.stats{grid-template-columns:1fr}.brand-copy{padding-right:12px}.brand-copy strong{font-size:13px}.brand-copy span{font-size:9px}.brand-mark{width:42px;height:42px;flex-basis:42px}.brand-mark svg{width:32px;height:32px}.product-title p{font-size:10px}.product-title h1{font-size:16px}}
+@media(max-width:430px){.masthead-inner{gap:9px;padding:10px}.brand-copy{display:none}.top-actions{gap:6px}.admin-chip{font-size:11px}.actions{flex-direction:column}.actions button{width:100%}.card{padding:16px}}
+</style>
 </head>
 <body>
-  <div class="layout">
-    <aside class="sidebar">
-      <div class="brand"><span class="brand-icon">⌕</span><span>GovDoc <b>AI</b></span></div>
-      <div class="nav-label">Workspace</div>
-      <a class="nav-link" href="/user"><span class="nav-icon">▤</span>Citizen Assistant</a>
-      <a class="nav-link active" href="/admin"><span class="nav-icon">▣</span>Admin Dashboard</a>
-      <div class="sidebar-bottom">Manage documents that power source-aware answers.</div>
-    </aside>
-    <main class="main">
-      <header class="topbar">
-        <div class="crumb">Workspace <span aria-hidden="true">/</span> <strong>Admin Dashboard</strong></div>
-        <div class="top-right"><span>Knowledge base management</span><button class="theme-toggle" id="themeToggle" type="button">☾ Dark mode</button><span class="avatar">A</span></div>
-      </header>
-      <div class="content">
-        <div class="page-heading"><div class="heading-icon">▣</div><div><h1>Knowledge Base</h1><p>Upload and manage the documents used by the Government RAG Assistant.</p></div></div>
-        <section class="stats">
-          <div class="stat"><div class="stat-icon">▤</div><div><div class="stat-label">Documents available</div><div class="stat-value" id="documentCount">{{ documents|length }}</div></div></div>
-          <div class="stat"><div class="stat-icon">↥</div><div><div class="stat-label">Supported formats</div><div class="stat-value">3</div></div></div>
-          <div class="stat"><div class="stat-icon">◈</div><div><div class="stat-label">Knowledge base</div><div class="stat-value" style="font-size:18px">Document RAG</div></div></div>
-        </section>
-        <section class="card">
-          <div class="card-header"><div><h2>Add a government document</h2><p>Choose a file to process and add it to the searchable knowledge base.</p></div><span class="badge">PDF · DOCX · TXT</span></div>
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="brand-mark" aria-hidden="true">
+      <!-- Project-created Ashoka Chakra motif; not an official Government emblem. -->
+      <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3">
+        <circle cx="50" cy="50" r="35"/><circle cx="50" cy="50" r="5"/>
+        <g stroke-width="2"><path d="M50 15V85M15 50H85M25.3 25.3L74.7 74.7M74.7 25.3L25.3 74.7M36.6 16.1L63.4 83.9M16.1 36.6L83.9 63.4M63.4 16.1L36.6 83.9M16.1 63.4L83.9 36.6"/></g>
+      </svg>
+    </div>
+    <div class="brand-copy"><strong>भारत सरकार शैली</strong><span>Government-inspired project interface</span></div>
+    <div class="product-title"><h1>Government Document RAG Assistant</h1><p>Intelligent Retrieval of Government Documents</p></div>
+    <div class="masthead-art" aria-hidden="true">
+      <svg viewBox="0 0 190 65" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M8 54H182M20 52V34H170V52M30 34Q95 -3 160 34M39 34V52M55 29V52M72 24V52M95 20V52M118 24V52M135 29V52M151 34V52M15 55H175"/>
+        <path d="M95 9V2M95 2L104 5L95 8" stroke="#f59e0b"/>
+      </svg>
+    </div>
+  </div>
+  <div class="tricolor"></div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="side-brand">
+      <svg viewBox="0 0 100 70" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
+        <path d="M8 60H92M14 55V34H86V55M20 34Q50 3 80 34M25 34V55M38 27V55M50 22V55M62 27V55M75 34V55M10 64H90"/>
+      </svg>
+      <strong>Admin Portal</strong>
+    </div>
+    <div class="nav-label">Administration</div>
+    <a class="nav-link active" href="#dashboard"><span class="nav-icon">▦</span>Dashboard</a>
+    <a class="nav-link" href="#document-management"><span class="nav-icon">⇧</span>Document Management</a>
+    <a class="nav-link" href="#knowledge-base"><span class="nav-icon">▱</span>Knowledge Base</a>
+    <div class="sidebar-bottom">Manage the documents that support source-aware answers.<br><br><span style="color:#fbbf24">Academic project prototype</span></div>
+    <a class="nav-link" href="/" style="margin-top:14px"><span class="nav-icon">⇥</span>Logout</a>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="breadcrumb">Admin Portal <span aria-hidden="true">/</span> <strong>Dashboard</strong></div>
+      <div class="top-actions">
+        <button class="theme-toggle" id="themeToggle" type="button">☾ Dark mode</button>
+        <div class="admin-chip"><span class="avatar">A</span><span>Admin</span></div>
+      </div>
+    </div>
+
+    <div class="content" id="dashboard">
+      <section class="page-heading">
+        <div class="heading-accent"></div>
+        <div><h2>Admin Dashboard</h2><p>Manage government documents, build the knowledge base and monitor document ingestion.</p></div>
+      </section>
+
+      <section class="stats" aria-label="Knowledge base summary">
+        <div class="stat"><div class="stat-icon">▤</div><div><div class="stat-label">Documents listed</div><div class="stat-value" id="documentCount">{{ documents|length }}</div><div class="stat-note">Available in the application inventory</div></div></div>
+        <div class="stat"><div class="stat-icon">▱</div><div><div class="stat-label">Supported formats</div><div class="stat-value">3</div><div class="stat-note">PDF · DOCX · TXT</div></div></div>
+        <div class="stat"><div class="stat-icon">◉</div><div><div class="stat-label">Knowledge base</div><div class="stat-value" style="font-size:19px">Document RAG</div><div class="stat-note">Retrieval-augmented document system</div></div></div>
+      </section>
+
+      <section class="workspace">
+        <article class="card" id="document-management">
+          <div class="card-header">
+            <div class="card-icon">⇧</div>
+            <div><h3>Upload Government Document</h3><p>Add new documents to the RAG knowledge base.</p></div>
+            <span class="format-badge">PDF · DOCX · TXT</span>
+          </div>
           <form id="uploadForm">
             <div class="dropzone" id="dropzone">
-              <div class="upload-icon" aria-hidden="true">↥</div>
-              <h3>Choose a document to upload</h3>
-              <p>Supported file types: PDF, DOCX and TXT</p>
+              <div class="upload-symbol" aria-hidden="true">⇧</div>
+              <strong>Drag &amp; drop files here</strong>
+              <p>or select a file from your computer</p>
               <input class="file-picker" type="file" id="document" name="document" accept=".pdf,.docx,.txt" aria-label="Choose a government document">
               <div class="file-name" id="fileName" aria-live="polite">No file selected</div>
+              <p style="margin:10px 0 0">Maximum file size is subject to server configuration.</p>
             </div>
-            <div class="actions"><button type="submit" class="primary" id="processButton">Process document →</button><button type="button" class="secondary" id="clearButton">Clear</button></div>
+            <div class="actions"><button type="submit" class="primary" id="processButton">Upload &amp; Process</button><button type="button" class="secondary" id="clearButton">Clear</button></div>
             <div id="result" class="message" role="status" aria-live="polite"></div>
           </form>
-        </section>
-        <section class="card">
-          <div class="card-header"><div><h2>Documents stored in the system</h2><p>Files currently listed in the application's document inventory.</p></div><span class="badge" id="inventoryBadge">{{ documents|length }} document(s)</span></div>
-          <div class="search-wrap"><input class="search" id="searchDocuments" type="search" placeholder="Search documents…" aria-label="Search documents"></div>
+        </article>
+
+        <article class="card" id="knowledge-base">
+          <div class="card-header">
+            <div class="card-icon">▤</div>
+            <div><h3>Document Repository</h3><p>View and search documents currently listed by the application.</p></div>
+          </div>
+          <div class="search-wrap"><input class="search" id="searchDocuments" type="search" placeholder="Search documents..." aria-label="Search documents"></div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Document</th><th>Format</th><th>Status</th></tr></thead>
+              <thead><tr><th>#</th><th>Document Name</th><th>Format</th><th>Status</th></tr></thead>
               <tbody id="documentList">
                 {% for document in documents %}
-                <tr data-document-name="{{ document|string|e }}"><td><div class="doc-name"><span class="doc-icon">{{ document.rsplit('.', 1)[-1]|upper if '.' in document else 'DOC' }}</span><span>{{ document }}</span></div></td><td>{{ document.rsplit('.', 1)[-1]|upper if '.' in document else '—' }}</td><td><span class="status-pill"><span class="status-dot"></span>Available</span></td></tr>
+                <tr data-document-name="{{ document|string|e }}">
+                  <td>{{ loop.index }}</td>
+                  <td><div class="doc-name"><span class="doc-icon">{{ document.rsplit('.', 1)[-1]|upper if '.' in document else 'DOC' }}</span><span>{{ document }}</span></div></td>
+                  <td>{{ document.rsplit('.', 1)[-1]|upper if '.' in document else '—' }}</td>
+                  <td><span class="status-pill"><span class="status-dot"></span>Available</span></td>
+                </tr>
                 {% else %}
-                <tr class="empty-row"><td colspan="3"><div class="empty">No documents are listed yet. Upload a document above to get started.</div></td></tr>
+                <tr class="empty-row"><td colspan="4"><div class="empty">No documents are listed yet. Upload a document to get started.</div></td></tr>
                 {% endfor %}
               </tbody>
             </table>
           </div>
           <div class="empty" id="noMatches" hidden>No documents match your search.</div>
-        </section>
-        <div class="footnote"> <strong>Multimodal document processing:</strong> OCR is used for image-based PDF content. Processing time depends on the document, its pages, and the content being analyzed.</div>
-        <div class="footer">GovDoc AI · Knowledge base administration</div>
-      </div>
-    </main>
-  </div>
-  <script>
-    // Theme preference is retained across visits, as in the Major Project GUI.
-    const root = document.documentElement;
-    const themeToggle = document.getElementById("themeToggle");
-    function applyTheme(theme) {
-      root.dataset.theme = theme;
-      try { localStorage.setItem("grag-theme", theme); } catch (_) {}
-      themeToggle.textContent = theme === "dark" ? "☀ Light mode" : "☾ Dark mode";
+        </article>
+      </section>
+
+      <div class="footnote"><strong>Multimodal document processing:</strong> OCR is used for image-based PDF content. Processing time depends on the document, its pages, and the content being analyzed.</div>
+      <div class="footer">Government Document RAG Assistant · Admin Portal · Academic project prototype</div>
+    </div>
+  </main>
+</div>
+
+<script>
+const root = document.documentElement;
+const themeToggle = document.getElementById("themeToggle");
+function applyTheme(theme) {
+  root.dataset.theme = theme;
+  try { localStorage.setItem("grag-theme", theme); } catch (_) {}
+  themeToggle.textContent = theme === "dark" ? "☀ Light mode" : "☾ Dark mode";
+}
+let savedTheme = "light";
+try { savedTheme = localStorage.getItem("grag-theme") || "light"; } catch (_) {}
+applyTheme(savedTheme);
+themeToggle.addEventListener("click", () => applyTheme(root.dataset.theme === "dark" ? "light" : "dark"));
+
+const fileInput = document.getElementById("document");
+const fileName = document.getElementById("fileName");
+const uploadForm = document.getElementById("uploadForm");
+const resultDiv = document.getElementById("result");
+const processButton = document.getElementById("processButton");
+const clearButton = document.getElementById("clearButton");
+const dropzone = document.getElementById("dropzone");
+
+fileInput.addEventListener("change", updateFileName);
+function updateFileName() {
+  fileName.textContent = fileInput.files.length ? "Selected: " + fileInput.files[0].name : "No file selected";
+}
+function showResult(message, type) {
+  resultDiv.textContent = message;
+  resultDiv.className = "message" + (type ? " " + type : "");
+}
+function clearUpload() {
+  fileInput.value = "";
+  updateFileName();
+  resultDiv.textContent = "";
+  resultDiv.className = "message";
+}
+clearButton.addEventListener("click", clearUpload);
+
+["dragenter", "dragover"].forEach(type => dropzone.addEventListener(type, event => {
+  event.preventDefault(); event.stopPropagation(); dropzone.classList.add("dragover");
+}));
+["dragleave", "drop"].forEach(type => dropzone.addEventListener(type, event => {
+  event.preventDefault(); event.stopPropagation(); dropzone.classList.remove("dragover");
+}));
+dropzone.addEventListener("drop", event => {
+  if (!event.dataTransfer.files.length) return;
+  try {
+    fileInput.files = event.dataTransfer.files;
+    updateFileName();
+    resultDiv.textContent = "";
+    resultDiv.className = "message";
+  } catch (_) {
+    showResult("Could not select the dropped file. Please use the file picker.", "error");
+  }
+});
+
+uploadForm.addEventListener("submit", processDocument);
+async function processDocument(event) {
+  event.preventDefault();
+  const file = fileInput.files[0];
+  if (!file) { showResult("Please select a document first.", "error"); return; }
+  const extension = file.name.split(".").pop().toLowerCase();
+  if (!["pdf", "docx", "txt"].includes(extension)) {
+    showResult("Unsupported file type. Please choose a PDF, DOCX, or TXT file.", "error"); return;
+  }
+  const formData = new FormData();
+  formData.append("document", file);
+  processButton.disabled = true;
+  clearButton.disabled = true;
+  processButton.textContent = "Processing document...";
+  showResult("Uploading and processing your document. This may take a moment...", "info");
+  try {
+    const response = await fetch("/admin/process", { method: "POST", body: formData });
+    let data;
+    try { data = await response.json(); }
+    catch (_) { throw new Error("The server returned an unreadable response. Check the Flask terminal for details."); }
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || data.result?.message || "Document processing failed.");
     }
-    let savedTheme = "light";
-    try { savedTheme = localStorage.getItem("grag-theme") || "light"; } catch (_) {}
-    applyTheme(savedTheme);
-    themeToggle.addEventListener("click", () => applyTheme(root.dataset.theme === "dark" ? "light" : "dark"));
+    const result = data.result || {};
+    const documentName = result.document_name || file.name;
+    const chunksCreated = result.chunks_created;
+    let successMessage = "Document processed successfully: " + documentName + ".";
+    if (chunksCreated !== undefined && chunksCreated !== null) successMessage += " Chunks created: " + chunksCreated + ".";
+    successMessage += " Refreshing document list...";
+    showResult(successMessage, "success");
+    fileInput.value = "";
+    updateFileName();
+    setTimeout(() => window.location.reload(), 1500);
+  } catch (error) {
+    showResult(error.message || "Could not connect to the Flask server. Check the server terminal.", "error");
+  } finally {
+    processButton.disabled = false;
+    clearButton.disabled = false;
+    processButton.textContent = "Upload & Process";
+  }
+}
 
-    const fileInput = document.getElementById("document");
-    const fileName = document.getElementById("fileName");
-    const uploadForm = document.getElementById("uploadForm");
-    const resultDiv = document.getElementById("result");
-    const processButton = document.getElementById("processButton");
-    const clearButton = document.getElementById("clearButton");
-    const dropzone = document.getElementById("dropzone");
-
-    fileInput.addEventListener("change", updateFileName);
-    function updateFileName() {
-      fileName.textContent = fileInput.files.length ? "Selected: " + fileInput.files[0].name : "No file selected";
-    }
-    function showResult(message, type) {
-      resultDiv.textContent = message;
-      resultDiv.className = "message" + (type ? " " + type : "");
-    }
-    function clearUpload() {
-      fileInput.value = "";
-      updateFileName();
-      resultDiv.textContent = "";
-      resultDiv.className = "message";
-    }
-    clearButton.addEventListener("click", clearUpload);
-
-    ["dragenter", "dragover"].forEach(type => dropzone.addEventListener(type, event => {
-      event.preventDefault(); event.stopPropagation(); dropzone.classList.add("dragover");
-    }));
-    ["dragleave", "drop"].forEach(type => dropzone.addEventListener(type, event => {
-      event.preventDefault(); event.stopPropagation(); dropzone.classList.remove("dragover");
-    }));
-    dropzone.addEventListener("drop", event => {
-      if (!event.dataTransfer.files.length) return;
-      fileInput.files = event.dataTransfer.files;
-      updateFileName();
-      resultDiv.textContent = "";
-      resultDiv.className = "message";
-    });
-
-    uploadForm.addEventListener("submit", processDocument);
-    async function processDocument(event) {
-      event.preventDefault();
-      const file = fileInput.files[0];
-      if (!file) { showResult("Please select a document first.", "error"); return; }
-      const extension = file.name.split(".").pop().toLowerCase();
-      if (!["pdf", "docx", "txt"].includes(extension)) {
-        showResult("Unsupported file type. Please choose a PDF, DOCX, or TXT file.", "error"); return;
-      }
-
-      const formData = new FormData();
-      formData.append("document", file);
-      processButton.disabled = true;
-      clearButton.disabled = true;
-      processButton.textContent = "Processing document…";
-      showResult("Uploading and processing your document. This may take a moment…", "info");
-
-      try {
-        const response = await fetch("/admin/process", { method: "POST", body: formData });
-        let data;
-        try { data = await response.json(); }
-        catch (_) { throw new Error("The server returned an unreadable response. Check the Flask terminal for details."); }
-
-        if (!response.ok || !data.success) {
-          throw new Error(data.message || data.result?.message || "Document processing failed.");
-        }
-
-        const result = data.result || {};
-        const documentName = result.document_name || file.name;
-        const chunksCreated = result.chunks_created;
-        let successMessage = "Document processed successfully: " + documentName + ".";
-        if (chunksCreated !== undefined && chunksCreated !== null) successMessage += " Chunks created: " + chunksCreated + ".";
-        successMessage += " Refreshing document list…";
-        showResult(successMessage, "success");
-        fileInput.value = "";
-        updateFileName();
-        // Flask remains the source of truth for the inventory; reload it after processing.
-        setTimeout(() => window.location.reload(), 1500);
-      } catch (error) {
-        showResult(error.message || "Could not connect to the Flask server. Check the server terminal.", "error");
-      } finally {
-        processButton.disabled = false;
-        clearButton.disabled = false;
-        processButton.textContent = "Process document →";
-      }
-    }
-
-    // Filter the table rows without changing the server-rendered inventory.
-    const searchInput = document.getElementById("searchDocuments");
-    const documentRows = [...document.querySelectorAll("#documentList tr[data-document-name]")];
-    const noMatches = document.getElementById("noMatches");
-    searchInput.addEventListener("input", () => {
-      const term = searchInput.value.trim().toLowerCase();
-      let visibleCount = 0;
-      documentRows.forEach(row => {
-        const matches = row.dataset.documentName.toLowerCase().includes(term);
-        row.hidden = !matches;
-        if (matches) visibleCount++;
-      });
-      noMatches.hidden = visibleCount !== 0 || documentRows.length === 0;
-    });
-  </script>
+const searchInput = document.getElementById("searchDocuments");
+const documentRows = [...document.querySelectorAll("#documentList tr[data-document-name]")];
+const noMatches = document.getElementById("noMatches");
+searchInput.addEventListener("input", () => {
+  const term = searchInput.value.trim().toLowerCase();
+  let visibleCount = 0;
+  documentRows.forEach(row => {
+    const matches = row.dataset.documentName.toLowerCase().includes(term);
+    row.hidden = !matches;
+    if (matches) visibleCount++;
+  });
+  noMatches.hidden = visibleCount !== 0 || documentRows.length === 0;
+});
+</script>
 </body>
 </html>
