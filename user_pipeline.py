@@ -46,15 +46,31 @@ def user_query_pipeline(query):
     )
 
     # Step 5: Send the prompt to the LLM
-    answer = generate_response(prompt)
+    json_llm_response = generate_response(prompt)
 
+    evidence_ids=json_llm_response.get("evidence_ids", [])
+    citations=dict()
     
+    count=0
+    for i in range(len(evidence_ids)):
+        for doc in retrieved_documents:
+            if doc["evidence_id"]==evidence_ids[i]:
+                
+                print("evidence_id : ",doc["evidence_id"])
+                print("doc text :",doc["text"])
+                citations[evidence_ids[i]]=doc
+                
+                count=count+1
+                break
+        
+        
+    
+    json_llm_response["citation_list"]=citations
+    
+    json_llm_response["query"]=query
+    json_llm_response["language"]=language
+        
     # Step 6: Return the complete result
-    return {
-        "query": query,
-        "language": language,
-        "answer": answer,
-        "sources": retrieved_documents
-    }
+    return json_llm_response
     
     

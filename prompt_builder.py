@@ -150,33 +150,60 @@ Detected Language:
 Government Document Context:
 {context}
 
-Structure your response using these sections:
+STRUCTURED JSON OUTPUT INSTRUCTIONS:
 
-1. Direct Answer:
-   Answer the user's question first in 2–3 concise sentences.
-   Summarize the main conclusion without repeating the
-   individual points that will appear under Key Findings.
+Return the response strictly as a valid JSON object.
+Do not include Markdown code fences or explanatory text outside the JSON.
 
-2. Key Findings:
-   Present the main findings from the provided government
-   document context as clear bullet points.
+Use the following structure:
 
-Citation rules:
-- Each Key Finding must include the Evidence ID or IDs
-  that directly support that specific finding.
-- Examine all provided evidence chunks before selecting citations.
-- Do not automatically reuse E001 or any other ID for every finding.
-- Different findings may cite the same Evidence ID only when
-  that evidence genuinely supports each finding.
-- Use multiple Evidence IDs when multiple chunks jointly
-  support a finding.
-- Use only Evidence IDs explicitly provided in the context.
-- Never invent, modify, or guess an Evidence ID.
-- If no retrieved evidence supports a claim, do not present
-  that claim as an established fact.
-- Preserve the exact citation format, such as [E001] or [E003].
+{{
+  "response_language": "{response_language}",
 
-Now answer the user's latest question following all the instructions above.
+  "direct_answer": {{
+    "text": "Answer the user's question in 2–3 concise sentences. Summarize the main conclusion without repeating the individual Key Findings."
+  }},
+
+  "key_findings": [
+    {{
+      "text": "First important finding.",
+      "evidence_ids": ["E001", "E002"]
+    }},
+    {{
+      "text": "Second important finding.",
+      "evidence_ids": ["E003"]
+    }}
+  ],
+
+  "evidence_ids": ["E001", "E002", "E003"]
+}}
+
+JSON OUTPUT RULES:
+
+1. Each Key Finding must include its own evidence_ids list containing only the Evidence IDs that directly support that finding.
+
+2. Examine all retrieved evidence chunks before selecting Evidence IDs.
+
+3. Ignore irrelevant chunks and do not cite them.
+
+4. Do not automatically reuse E001 or any other Evidence ID for every finding.
+
+5. Different findings may cite the same Evidence ID only when that evidence genuinely supports each finding.
+
+6. Use multiple Evidence IDs when multiple chunks jointly support a finding.
+
+7. Use only Evidence IDs explicitly provided in the retrieved context. Never invent, modify, or guess an Evidence ID.
+
+8. The overall evidence_ids list must contain all unique Evidence IDs used in the Key Findings.
+
+9. If no retrieved evidence supports a finding, do not present it as an established fact.
+
+10. If no relevant evidence is available, return an empty evidence_ids list and clearly explain the limitation in direct_answer.
+
+11. The response_language must be {response_language}.
+
+12. Return valid JSON only. Escape special characters properly and do not include trailing commas.
+
+Now generate the JSON response following all the instructions above.
 """
-
     return prompt.strip()

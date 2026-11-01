@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 from user_pipeline import user_query_pipeline
 from admin_pipeline import process_document
 from get_directory_documents import get_documents
+import json 
 
 from feedback_store import (
     initialize_feedback_db,
@@ -97,19 +98,22 @@ def user_query():
         }), 400
 
     try:
-        result = user_query_pipeline(query.strip())
+        json_llm_response = user_query_pipeline(query.strip())
 
-        # Store the question, answer, and retrieved sources.
-        # The interaction ID links later feedback to this response.
+        # Convert structured LLM response into JSON string for database storage.
+        answer_json = json.dumps(json_llm_response, ensure_ascii=False)
+
+        # Store question, structured answer, and filtered citations.
         interaction_id = save_interaction(
-            question=result["query"],
-            answer=result["answer"],
-            sources=result["sources"],
+            question=json_llm_response["query"],
+            answer=answer_json,
+            sources=json_llm_response["citation_list"],
         )
 
+        # Return the complete response to the frontend.
         return jsonify({
             "success": True,
-            "result": result,
+            "result": json_llm_response,
             "interaction_id": interaction_id,
         })
 
