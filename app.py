@@ -1,15 +1,33 @@
 from flask import Flask, request, jsonify, render_template
 from pathlib import Path
+import traceback
+from werkzeug.utils import secure_filename
 
 from user_pipeline import user_query_pipeline
 from admin_pipeline import process_document
 from get_directory_documents import get_documents
 
-
-app = Flask(
-    __name__,
-    template_folder="gui"
+from feedback_store import (
+    initialize_feedback_db,
+    save_interaction,
+    save_feedback,
+    save_feedback_comment,
 )
+
+# Initialize the feedback database when the application starts.
+initialize_feedback_db()
+
+app = Flask(__name__, template_folder="gui")
+
+
+# --------------------------------------------------
+# Configuration
+# --------------------------------------------------
+
+BASE_DIR = Path(__file__).resolve().parent
+DOCUMENTS_DIR = BASE_DIR / "data" / "documents"
+
+ALLOWED_EXTENSIONS = {".pdf", ".docx", ".txt"}
 
 
 # --------------------------------------------------
@@ -18,10 +36,7 @@ app = Flask(
 
 @app.route("/")
 def home():
-
-    return render_template(
-        "login.html"
-    )
+    return render_template("login.html")
 
 
 # --------------------------------------------------
@@ -30,13 +45,8 @@ def home():
 
 @app.route("/admin")
 def admin_page():
-
     documents = get_documents()
-
-    return render_template(
-        "admin.html",
-        documents=documents
-    )
+    return render_template("admin.html", documents=documents)
 
 
 # --------------------------------------------------
@@ -45,10 +55,7 @@ def admin_page():
 
 @app.route("/user")
 def user_page():
-
-    return render_template(
-        "user.html"
-    )
+    return render_template("user.html")
 
 
 # --------------------------------------------------
@@ -57,32 +64,21 @@ def user_page():
 
 @app.route("/login", methods=["POST"])
 def login():
-
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
 
     user_id = data.get("id")
     password = data.get("password")
 
     if user_id == "user" and password == "user":
+        return jsonify({"success": True, "role": "user"})
 
-        return jsonify({
-            "success": True,
-            "role": "user"
-        })
+    if user_id == "admin" and password == "admin":
+        return jsonify({"success": True, "role": "admin"})
 
-    elif user_id == "admin" and password == "admin":
-
-        return jsonify({
-            "success": True,
-            "role": "admin"
-        })
-
-    else:
-
-        return jsonify({
-            "success": False,
-            "message": "Invalid ID or password"
-        }), 401
+    return jsonify({
+        "success": False,
+        "message": "Invalid ID or password",
+    }), 401
 
 
 # --------------------------------------------------
@@ -91,32 +87,42 @@ def login():
 
 @app.route("/user/query", methods=["POST"])
 def user_query():
-
-    data = request.get_json()
-
+    data = request.get_json(silent=True) or {}
     query = data.get("query")
 
-    if not query or not query.strip():
-
+    if not isinstance(query, str) or not query.strip():
         return jsonify({
             "success": False,
-            "message": "Query cannot be empty"
+            "message": "Query cannot be empty",
         }), 400
 
     try:
+        result = user_query_pipeline(query.strip())
 
-        result = user_query_pipeline(query)
+        # Store the question, answer, and retrieved sources.
+        # The interaction ID links later feedback to this response.
+        interaction_id = save_interaction(
+            question=result["query"],
+            answer=result["answer"],
+            sources=result["sources"],
+        )
 
         return jsonify({
             "success": True,
-            "result": result
+            "result": result,
+            "interaction_id": interaction_id,
         })
 
-    except Exception as e:
-
+    except Exception:
+        app.logger.exception(
+            "User query processing or interaction storage failed"
+        )
         return jsonify({
             "success": False,
-            "message": str(e)
+            "message": (
+                "Unable to process the query. "
+                "Please check the server logs."
+            ),
         }), 500
 
 
@@ -126,78 +132,202 @@ def user_query():
 
 @app.route("/admin/process", methods=["POST"])
 def admin_process():
-
     if "document" not in request.files:
-
         return jsonify({
             "success": False,
-            "message": "No document selected"
+            "message": "No document selected",
         }), 400
-
 
     document = request.files["document"]
 
-
-    if document.filename == "":
-
+    if not document.filename:
         return jsonify({
             "success": False,
-            "message": "No document selected"
+            "message": "No document selected",
         }), 400
 
+    # Validate and sanitize the uploaded filename.
+    safe_filename = secure_filename(document.filename)
 
-    allowed_extensions = [
-        ".pdf",
-        ".docx",
-        ".txt"
-    ]
+    if not safe_filename:
+        return jsonify({
+            "success": False,
+            "message": "Invalid document filename",
+        }), 400
 
-    extension = Path(document.filename).suffix.lower()
+    extension = Path(safe_filename).suffix.lower()
 
-
-    if extension not in allowed_extensions:
-
+    if extension not in ALLOWED_EXTENSIONS:
         return jsonify({
             "success": False,
             "message": (
                 "Invalid document type. "
                 "Only PDF, DOCX and TXT are allowed."
-            )
+            ),
         }), 400
 
-
-    document_path = (
-        Path("data/documents")
-        / document.filename
-    )
-
-
-    document.save(document_path)
-
+    document_path = DOCUMENTS_DIR / safe_filename
 
     try:
+        DOCUMENTS_DIR.mkdir(parents=True, exist_ok=True)
+        document.save(str(document_path))
 
-        result = process_document(str(document_path))
-             
-        if result["success"] :            
-           return jsonify({
-            "success": True,
-            "result": result
-            })
-           
-        else :
-            
+        result = process_document(document_path)
+
+        # Validate the processing result before reporting success.
+        if result is None or result is False:
             return jsonify({
-                "success" : False,
-                "result" : result
-            })
+                "success": False,
+                "message": (
+                    "Document processing failed. "
+                    "No successful processing result was returned."
+                ),
+            }), 500
 
+        if isinstance(result, dict):
+            if result.get("success") is False:
+                return jsonify({
+                    "success": False,
+                    "message": result.get(
+                        "message",
+                        "Document processing failed.",
+                    ),
+                    "result": result,
+                }), 500
 
-    except Exception as e:
+            chunks_created = result.get("chunks_created")
+
+            # The ingestion pipeline returns status="skipped" with
+            # chunks_created=0 when the document is unchanged. That is
+            # successful and must not be treated as an empty extraction.
+            if (
+                result.get("status") == "empty"
+                or (
+                    chunks_created is not None
+                    and chunks_created <= 0
+                    and result.get("status") != "skipped"
+                )
+            ):
+                return jsonify({
+                    "success": False,
+                    "message": (
+                        result.get("message")
+                        or "No text chunks were extracted from the document. "
+                        "For scanned PDFs, verify that OCR is installed "
+                        "and configured correctly."
+                    ),
+                    "result": result,
+                }), 422
 
         return jsonify({
+            "success": True,
+            "message": (
+                "Document processed successfully. "
+                "OCR is used by the document-processing pipeline "
+                "when required."
+            ),
+            "result": result,
+        })
+
+    except Exception as error:
+        print(f"Error processing document {safe_filename}: {error}")
+        traceback.print_exc()
+        return jsonify({
             "success": False,
-            "message": str(e)
+            "message": (
+                "Document processing failed. Check the Flask "
+                "server terminal for the detailed error."
+            ),
+        }), 500
+
+
+# --------------------------------------------------
+# Feedback Rating API
+# --------------------------------------------------
+
+@app.route("/feedback", methods=["POST"])
+def submit_feedback():
+    data = request.get_json(silent=True) or {}
+
+    interaction_id = data.get("interaction_id")
+    rating = data.get("rating")
+
+    if (
+        isinstance(interaction_id, bool)
+        or not isinstance(interaction_id, int)
+        or interaction_id <= 0
+    ):
+        return jsonify({
+            "success": False,
+            "error": "Invalid interaction ID",
+        }), 400
+
+    if isinstance(rating, bool) or rating not in (1, -1):
+        return jsonify({
+            "success": False,
+            "error": "Invalid rating",
+        }), 400
+
+    try:
+        save_feedback(interaction_id, rating)
+        return jsonify({
+            "success": True,
+            "message": "Rating saved successfully",
+        })
+
+    except Exception:
+        app.logger.exception("Unable to save rating")
+        return jsonify({
+            "success": False,
+            "error": "Unable to save rating",
+        }), 500
+
+
+# --------------------------------------------------
+# Feedback Comment API
+# --------------------------------------------------
+
+@app.route("/feedback/comment", methods=["POST"])
+def submit_feedback_comment():
+    data = request.get_json(silent=True) or {}
+
+    interaction_id = data.get("interaction_id")
+    comment = data.get("comment", "")
+
+    if (
+        isinstance(interaction_id, bool)
+        or not isinstance(interaction_id, int)
+        or interaction_id <= 0
+    ):
+        return jsonify({
+            "success": False,
+            "error": "Invalid interaction ID",
+        }), 400
+
+    if not isinstance(comment, str) or not comment.strip():
+        return jsonify({
+            "success": False,
+            "error": "Please enter a comment",
+        }), 400
+
+    try:
+        save_feedback_comment(interaction_id, comment.strip())
+        return jsonify({
+            "success": True,
+            "message": "Comment saved successfully",
+        })
+
+    except ValueError as error:
+        return jsonify({
+            "success": False,
+            "error": str(error),
+        }), 400
+
+    except Exception:
+        app.logger.exception("Unable to save feedback comment")
+        return jsonify({
+            "success": False,
+            "error": "Unable to save comment",
         }), 500
 
 
@@ -206,9 +336,4 @@ def admin_process():
 # --------------------------------------------------
 
 if __name__ == "__main__":
-
-    app.run(
-        host="127.0.0.1",
-        port=5000,
-        debug=True
-    )
+    app.run(host="127.0.0.1", port=5000, debug=True)

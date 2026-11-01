@@ -2,679 +2,757 @@
 <html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Government RAG Assistant | Citizen</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Citizen Assistant | GovDoc AI</title>
 
-<!-- Markdown renderer and HTML sanitizer -->
+<!-- Markdown rendering and HTML sanitization retained from the Major Project GUI -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
 
 <style>
 :root {
     color-scheme: light;
-    --bg:#f2f6fc;
-    --surface:#fff;
-    --surface2:#f8faff;
-    --text:#17263d;
-    --muted:#687991;
-    --border:#dfe7f1;
-    --primary:#1769d2;
-    --soft:#eaf3ff;
-    --danger:#b42318;
-    --success:#16845b;
-    --shadow:0 8px 28px #1a355510;
+    --bg:#f2f6fc; --surface:#fff; --surface2:#f8faff;
+    --text:#17263d; --ink:#172b4d; --muted:#687991;
+    --border:#dfe7f1; --primary:#1769d2; --primary2:#2563eb;
+    --soft:#eaf3ff; --danger:#b42318; --success:#16845b;
+    --success-bg:#ecfdf3; --shadow:0 8px 28px #1a355510;
 }
-
 [data-theme="dark"] {
     color-scheme:dark;
-    --bg:#0b1422;
-    --surface:#121f30;
-    --surface2:#17283d;
-    --text:#edf4ff;
-    --muted:#a7b7cc;
-    --border:#2a3d54;
-    --primary:#4c9aff;
-    --soft:#1b3452;
-    --danger:#ff9c96;
-    --success:#5ed4a3;
-    --shadow:0 8px 28px #0003;
+    --bg:#0b1422; --surface:#121f30; --surface2:#17283d;
+    --text:#edf4ff; --ink:#edf4ff; --muted:#a7b7cc;
+    --border:#2a3d54; --primary:#4c9aff; --primary2:#70adff;
+    --soft:#1b3452; --danger:#ff9c96; --success:#5ed4a3;
+    --success-bg:#12372d; --shadow:0 8px 28px #0003;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+.layout{min-height:100vh;display:grid;grid-template-columns:248px minmax(0,1fr)}
+.sidebar{background:linear-gradient(180deg,#102a56,#122343);color:#fff;padding:26px 16px;display:flex;flex-direction:column;min-height:100vh}
+.brand{display:flex;align-items:center;gap:10px;padding:0 10px 34px;font-size:20px;font-weight:800;letter-spacing:-.5px}
+.brand-icon{width:38px;height:38px;display:grid;place-items:center;background:#ffffff16;border:1px solid #ffffff25;border-radius:12px;font-size:22px}
+.brand span:last-child b{color:#fbbf24}
+.nav-label{padding:0 12px;margin:4px 0 10px;color:#90a8cc;font-size:10px;text-transform:uppercase;letter-spacing:1.6px;font-weight:800}
+.nav-link{display:flex;align-items:center;gap:12px;padding:13px 14px;margin:3px 0;border-radius:10px;color:#cbd8eb;text-decoration:none;font-weight:600}
+.nav-link.active{background:#ffffff19;color:#fff;box-shadow:inset 3px 0 #fbbf24}
+.nav-icon{width:20px;text-align:center;font-size:17px}
+.sidebar-bottom{margin-top:auto;border-top:1px solid #ffffff25;padding:18px 10px 0;color:#b8c8df;font-size:12px;line-height:1.6}
+.secure-dot{color:#75dfb1;margin-right:6px}
+.main{min-width:0}
+.topbar{min-height:68px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 36px;gap:14px}
+.crumb{color:var(--muted);font-size:13px}.crumb strong{color:var(--text)}
+.top-right{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px}
+.avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--soft);color:var(--primary);font-weight:800}
+.theme{border:1px solid var(--border);background:var(--surface);color:var(--text);padding:8px 10px;border-radius:9px;cursor:pointer;font:inherit;font-size:12px;font-weight:650}
+.content{max-width:1240px;margin:0 auto;padding:34px 36px 50px}
+.page-heading{display:flex;align-items:center;gap:16px;margin-bottom:26px}
+.heading-icon{width:58px;height:58px;border-radius:18px;background:var(--soft);color:var(--primary);display:grid;place-items:center;font-size:27px}
+.page-heading h1{margin:0 0 5px;font-size:27px;letter-spacing:-.8px;color:var(--ink)}
+.page-heading p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);margin-bottom:20px;min-width:0}
+.question-card,.answer-card{padding:25px 26px}
+.card-title-row{display:flex;gap:13px;align-items:center;margin-bottom:18px}
+.round-icon{height:42px;width:42px;flex:0 0 42px;border-radius:14px;background:var(--soft);color:var(--primary);display:grid;place-items:center;font-size:20px}
+.card-title-row h2{font-size:17px;margin:0 0 4px;color:var(--ink)}
+.card-title-row p{margin:0;color:var(--muted);font-size:13px}
+.question-box{width:100%;min-height:112px;resize:vertical;border:1px solid var(--border);border-radius:11px;padding:14px 15px;font:inherit;line-height:1.6;color:var(--text);background:var(--surface);outline:none}
+.question-box:focus{border-color:var(--primary2);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary2) 12%,transparent)}
+.question-footer{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-top:13px;flex-wrap:wrap}
+.hint{font-size:12px;color:var(--muted)}
+.primary{border:0;border-radius:10px;background:var(--primary2);color:#fff;font-weight:750;font-size:13px;padding:12px 18px;cursor:pointer;display:inline-flex;align-items:center;gap:9px;transition:.15s}
+.primary:hover{filter:brightness(.94);transform:translateY(-1px)}.primary:disabled{opacity:.65;cursor:wait;transform:none}
+.suggestions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:18px}
+.suggestion-label{font-size:12px;color:var(--muted);margin-right:3px}
+.chip{border:1px solid var(--border);background:var(--surface2);color:var(--primary);padding:8px 12px;border-radius:999px;font-size:12px;cursor:pointer}
+.chip:hover{border-color:var(--primary);background:var(--soft)}
+.answer-header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.answer-header h2{font-size:18px;margin:0;color:var(--ink)}
+.answer-status{display:none;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;background:var(--success-bg);color:var(--success);font-size:11px;font-weight:750}
+.answer-body{line-height:1.8;font-size:14px;color:var(--text);overflow-wrap:anywhere;min-height:20px}
+.answer-body p{margin:0 0 12px}.answer-body p:last-child{margin-bottom:0}
+.answer-body h1,.answer-body h2,.answer-body h3,.answer-body h4{font-size:1.08em;letter-spacing:0;margin:16px 0 8px;color:var(--ink)}
+.answer-body ul,.answer-body ol{padding-left:22px;margin:8px 0 14px}.answer-body li{margin:4px 0}
+.answer-body strong{font-weight:750;color:var(--ink)}
+.answer-body blockquote{margin:12px 0;padding:9px 14px;border-left:3px solid var(--primary);background:var(--soft);border-radius:0 8px 8px 0}
+.answer-body code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--soft);padding:2px 5px;border-radius:5px;overflow-wrap:anywhere}
+.answer-body pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--surface2);border:1px solid var(--border);padding:12px;border-radius:8px}
+.answer-body pre code{padding:0}.answer-body table{display:block;max-width:100%;overflow-x:auto;border-collapse:collapse}
+.answer-body th,.answer-body td{border:1px solid var(--border);padding:7px 9px;text-align:left}
+.answer-body a{color:var(--primary);overflow-wrap:anywhere}
+.answer-placeholder{padding:22px;background:var(--surface2);border:1px dashed var(--border);border-radius:12px;color:var(--muted);line-height:1.6}
+.answer-placeholder strong{display:block;color:var(--text);margin-bottom:5px}
+.meta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px;padding-top:17px;border-top:1px solid var(--border)}
+.meta-pill{font-size:12px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 11px}
+.source-section{margin-top:21px;padding-top:20px;border-top:1px solid var(--border)}
+.source-title{display:flex;align-items:center;gap:9px;font-weight:800;font-size:14px;color:var(--ink);margin-bottom:13px}
+.source-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.source-card{min-width:0;border:1px solid var(--border);border-radius:12px;padding:14px;background:var(--surface);scroll-margin-top:24px;overflow-wrap:anywhere}
+.source-card:target,.source-card.highlighted{border:2px solid var(--primary2);background:var(--surface2)}
+.source-top{display:flex;gap:10px;align-items:flex-start}
+.pdf-icon{width:34px;height:39px;flex:0 0 34px;border-radius:7px;background:#fff0f0;color:#d92d20;display:grid;place-items:center;font-size:10px;font-weight:900;border:1px solid #ffd5d2}
+.source-info{min-width:0}.source-name{font-weight:750;font-size:12px;line-height:1.45;overflow-wrap:anywhere;color:var(--text)}
+.source-page{font-size:11px;color:var(--muted);margin-top:5px}
+.evidence-badge{display:inline-block;margin-top:7px;padding:3px 7px;border-radius:5px;background:var(--soft);color:var(--primary);font-size:11px;font-weight:800}
+.evidence-link{color:var(--primary2);font-weight:750;text-decoration:underline;cursor:pointer}
+.source-excerpt{font-size:12px;color:var(--muted);line-height:1.6;margin:11px 0 0;overflow-wrap:anywhere}
+.source-full-text{display:none;white-space:pre-wrap;overflow-wrap:anywhere;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;line-height:1.7;color:var(--text)}
+.source-card.expanded .source-full-text{display:block}
+.source-toggle{margin-top:9px;border:0;background:transparent;color:var(--primary);font:inherit;font-size:11px;font-weight:700;padding:0;cursor:pointer}
+.empty-sources{color:var(--muted);font-size:13px;padding:12px 0}
+.message{display:none;margin-top:14px;padding:11px 13px;border-radius:9px;font-size:12px;line-height:1.5}
+.message.error{display:block;color:var(--danger);background:color-mix(in srgb,var(--danger) 8%,var(--surface));border:1px solid color-mix(in srgb,var(--danger) 25%,var(--border))}
+.message.info{display:block;color:var(--primary);background:var(--soft);border:1px solid var(--border)}
+.footer{text-align:center;color:var(--muted);font-size:11px;padding:12px 0 0}
+@media(max-width:1050px){.layout{grid-template-columns:205px minmax(0,1fr)}.source-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.content{padding:28px 24px}.topbar{padding:10px 24px}}
+@media(max-width:720px){.layout{display:block}.sidebar{min-height:auto;padding:14px 16px}.brand{padding:0 4px 12px}.nav-label,.sidebar-bottom{display:none}.nav-link{display:inline-flex;margin:0 4px 0 0;padding:9px 11px;font-size:12px}.topbar{min-height:54px;padding:9px 18px}.content{padding:24px 15px}.page-heading h1{font-size:22px}.heading-icon{width:48px;height:48px}.question-card,.answer-card{padding:19px}.source-grid{grid-template-columns:1fr}.top-right{gap:8px}.theme{padding:7px 8px}}
+
+/* Government-inspired visual identity */
+:root {
+    --gov-navy:#0b2f63;
+    --gov-saffron:#f29a1a;
+    --gov-green:#16834b;
+}
+.sidebar {
+    background:linear-gradient(180deg,#092b59 0%,#061f43 100%);
+    border-right:4px solid var(--gov-saffron);
+    position:relative;
+}
+.sidebar:after {
+    content:"";
+    position:absolute;
+    left:0;right:0;bottom:0;height:7px;
+    background:linear-gradient(to bottom,var(--gov-saffron) 0 33%,#fff 33% 66%,var(--gov-green) 66% 100%);
+}
+.brand-icon {
+    border-radius:50% !important;
+    background:#ffffff18 !important;
+    border:1px solid #ffffff55 !important;
+}
+.topbar {
+    border-top:4px solid var(--gov-saffron);
+    position:relative;
+}
+.topbar:after {
+    content:"";
+    position:absolute;left:0;right:0;bottom:-2px;height:2px;
+    background:var(--gov-green);
+}
+.page-heading h1 { color:var(--gov-navy); }
+.round-icon,.heading-icon { border-radius:12px; }
+.primary { background:var(--gov-navy); }
+.primary:hover { background:#164987; }
+.nav-link.active { box-shadow:inset 4px 0 var(--gov-saffron); }
+.gov-disclaimer {
+    margin:18px 0 0;padding:10px 13px;border:1px solid var(--border);
+    border-left:4px solid var(--gov-green);border-radius:9px;
+    color:var(--muted);font-size:11px;background:var(--surface);
+}
+/* Feedback UI: visual prototype only; no backend calls are made. */
+.feedback-panel {
+    margin-top:22px;padding:17px 0 0;border-top:1px solid var(--border);
+}
+.feedback-question {font-weight:800;color:var(--ink);margin-bottom:11px}
+.feedback-buttons {display:flex;gap:10px;flex-wrap:wrap}
+.feedback-btn {
+    border:1px solid var(--border);background:var(--surface2);color:var(--text);
+    border-radius:9px;padding:9px 14px;cursor:pointer;font:inherit;font-size:12px;font-weight:700;
+}
+.feedback-btn:hover:not(:disabled),.feedback-btn.selected {
+    border-color:var(--primary);background:var(--soft);
+}
+.feedback-btn:disabled {opacity:.6;cursor:default}
+.feedback-btn.positive {color:var(--success)}
+.feedback-btn.negative {color:var(--danger)}
+.feedback-thanks {
+    display:none;margin-top:12px;padding:11px 13px;border-radius:9px;
+    background:var(--success-bg);color:var(--success);font-weight:750;font-size:13px;
+}
+.feedback-thanks.visible {display:block}
+.feedback-modal-backdrop {
+    position:fixed;inset:0;z-index:1000;background:#07172dcc;
+    display:none;align-items:center;justify-content:center;padding:18px;
+}
+.feedback-modal-backdrop.visible {display:flex}
+.feedback-modal {
+    width:min(100%,520px);max-height:min(90vh,720px);overflow:auto;
+    background:var(--surface);color:var(--text);border:1px solid var(--border);
+    border-radius:15px;box-shadow:0 24px 70px #0005;padding:20px;
+}
+.feedback-modal-head {display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
+.feedback-modal-head h3 {margin:0;font-size:17px;color:var(--ink)}
+.feedback-close {
+    border:0;background:transparent;color:var(--muted);font-size:23px;cursor:pointer;
+}
+.feedback-modal p {font-size:12px;color:var(--muted);margin:0 0 12px}
+.feedback-reasons {display:grid;gap:9px;margin:13px 0}
+.feedback-reason {display:flex;align-items:flex-start;gap:9px;font-size:13px}
+.feedback-reason input {width:auto;margin:2px 0 0;accent-color:var(--primary)}
+.feedback-comment-label {display:block;font-size:12px;font-weight:750;margin:14px 0 6px}
+.feedback-comment {
+    width:100%;min-height:94px;resize:vertical;padding:11px 12px;
+    border:1px solid var(--border);border-radius:9px;background:var(--surface2);
+    color:var(--text);font:inherit;font-size:12px;
+}
+.feedback-modal-footer {display:flex;justify-content:flex-end;gap:9px;margin-top:15px}
+.feedback-counter {font-size:11px;color:var(--muted);text-align:right;margin-top:4px}
+.feedback-note {font-size:10px;color:var(--muted);margin-top:10px}
+@media(max-width:720px) {
+    .feedback-buttons {flex-direction:column;align-items:stretch}
+    .feedback-modal-footer button {flex:1}
 }
 
-* { box-sizing:border-box; }
 
-body {
-    margin:0;
-    background:var(--bg);
-    color:var(--text);
-    font:14px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
-}
+.masthead{background:var(--surface);border-bottom:1px solid var(--line)}
+.masthead-inner{min-height:94px;display:flex;align-items:center;gap:22px;padding:14px clamp(16px,3vw,42px)}
+.brand-mark{width:58px;height:58px;flex:0 0 58px;border:1px solid #c8d5e7;border-radius:50%;display:grid;place-items:center;color:var(--navy);background:var(--soft)}
+.brand-mark svg{width:42px;height:42px}
+.brand-copy{border-right:1px solid var(--line);padding-right:22px}
+.brand-copy strong{display:block;font-size:17px;color:var(--navy);line-height:1.25}
+.brand-copy span{font-size:11px;color:var(--muted)}
+.product-title{min-width:0;flex:1}
+.product-title h1{font-size:clamp(18px,2.2vw,27px);line-height:1.2;margin:0;color:var(--navy);letter-spacing:-.5px}
+.product-title p{margin:5px 0 0;color:var(--muted);font-size:13px}
+.masthead-art{width:180px;max-width:20%;height:58px;color:#a8bfdc;display:flex;align-items:center;justify-content:center}
+.tricolor{height:8px;background:linear-gradient(to bottom,var(--saffron) 0 33%,#fff 33% 66%,var(--green) 66% 100%);border-top:1px solid #e8edf4;border-bottom:1px solid #dce5ef}
 
-header {
-    min-height:70px;
-    background:var(--surface);
-    border-bottom:1px solid var(--border);
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:0 clamp(16px,4vw,48px);
-}
-
-.brand {
-    display:flex;
-    align-items:center;
-    gap:12px;
-    font-weight:800;
-    font-size:17px;
-}
-
-.logo {
-    width:38px;
-    height:38px;
-    border-radius:12px;
-    background:var(--soft);
-    color:var(--primary);
-    display:grid;
-    place-items:center;
-    font-size:20px;
-}
-
-.actions {
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
-
-.muted { color:var(--muted); }
-
-.theme,.linkbtn {
-    border:1px solid var(--border);
-    background:var(--surface);
-    color:var(--text);
-    padding:9px 12px;
-    border-radius:9px;
-    cursor:pointer;
-    font-weight:650;
-    text-decoration:none;
-}
-
-main {
-    max-width:1120px;
-    margin:0 auto;
-    padding:34px 22px 56px;
-}
-
-.eyebrow {
-    font-size:11px;
-    font-weight:800;
-    letter-spacing:1.4px;
-    text-transform:uppercase;
-    color:var(--primary);
-}
-
-h1 {
-    font-size:30px;
-    letter-spacing:-.8px;
-    margin:5px 0;
-}
-
-h2 { font-size:17px; margin:0; }
-
-.desc {
-    color:var(--muted);
-    font-size:13px;
-    margin:4px 0 18px;
-}
-
-.card {
-    background:var(--surface);
-    border:1px solid var(--border);
-    border-radius:15px;
-    box-shadow:var(--shadow);
-    padding:22px;
-    min-width:0;
-}
-
-.cardhead {
-    display:flex;
-    align-items:center;
-    gap:11px;
-    margin-bottom:8px;
-}
-
-.icon {
-    width:38px;
-    height:38px;
-    flex-shrink:0;
-    border-radius:12px;
-    background:var(--soft);
-    color:var(--primary);
-    display:grid;
-    place-items:center;
-    font-size:19px;
-}
-
-.btn {
-    border:0;
-    border-radius:9px;
-    padding:11px 16px;
-    background:var(--primary);
+/* Match the Admin GUI's shared government portal navigation styling */
+.sidebar {
+    background:linear-gradient(180deg,#082b59,#061f43);
     color:#fff;
-    font:inherit;
-    font-weight:750;
-    cursor:pointer;
-}
-
-.btn:disabled { opacity:.6; cursor:wait; }
-
-input,textarea {
-    font:inherit;
-    color:var(--text);
-    background:var(--surface2);
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:12px 13px;
-    width:100%;
-    outline:none;
-}
-
-textarea {
-    min-height:125px;
-    resize:vertical;
-}
-
-input:focus,textarea:focus {
-    border-color:var(--primary);
-    box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 15%,transparent);
-}
-
-.status {
-    font-size:13px;
-    margin-top:14px;
-    overflow-wrap:anywhere;
-}
-
-.error { color:var(--danger); }
-.success { color:var(--success); }
-.placeholder { color:var(--muted); }
-
-.composefoot {
+    padding:22px 15px 18px;
     display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:12px;
-    margin-top:12px;
-}
-
-.count {
-    font-size:12px;
-    color:var(--muted);
-}
-
-.grid {
-    display:grid;
-    grid-template-columns:1.2fr .8fr;
-    gap:18px;
-    margin-top:18px;
-}
-
-.answer {
-    overflow-wrap:anywhere;
-    min-height:54px;
-}
-
-.source-list {
-    display:grid;
-    gap:10px;
-}
-
-.source {
-    border:1px solid var(--border);
-    background:var(--surface2);
-    border-radius:11px;
-    padding:13px;
-    overflow-wrap:anywhere;
-    min-width:0;
-}
-
-.source-title {
-    font-weight:750;
-    font-size:13px;
-    margin-bottom:8px;
-}
-
-.source-detail {
-    font-size:12px;
-    color:var(--muted);
-    overflow-wrap:anywhere;
-    margin:5px 0;
-}
-
-.source-key {
-    color:var(--text);
-    font-weight:700;
-}
-
-.footer {
-    text-align:center;
-    color:var(--muted);
-    font-size:12px;
-    margin-top:25px;
-}
-
-/* Markdown formatting for answers and source text */
-.markdown-body {
-    line-height:1.8;
-    overflow-wrap:anywhere;
-    word-break:normal;
-}
-
-.markdown-body p {
-    margin:0 0 12px;
-}
-
-.markdown-body p:last-child {
-    margin-bottom:0;
-}
-
-.markdown-body h1,
-.markdown-body h2,
-.markdown-body h3,
-.markdown-body h4 {
-    color:var(--text);
-    font-size:1.08em;
-    letter-spacing:0;
-    margin:16px 0 8px;
-}
-
-.markdown-body ul,
-.markdown-body ol {
-    padding-left:25px;
-    margin:8px 0 14px;
-}
-
-.markdown-body li {
-    margin:4px 0;
-}
-
-.markdown-body strong {
-    color:var(--text);
-    font-weight:750;
-}
-
-.markdown-body em { font-style:italic; }
-
-.markdown-body blockquote {
-    margin:12px 0;
-    padding:9px 14px;
-    border-left:3px solid var(--primary);
-    background:var(--soft);
-    border-radius:0 8px 8px 0;
-}
-
-.markdown-body code {
-    font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
-    background:var(--soft);
-    padding:2px 5px;
-    border-radius:5px;
-    overflow-wrap:anywhere;
-}
-
-.markdown-body pre {
-    white-space:pre-wrap;
-    overflow-wrap:anywhere;
-    background:var(--surface);
-    border:1px solid var(--border);
-    padding:12px;
-    border-radius:8px;
-}
-
-.markdown-body pre code {
-    padding:0;
-}
-
-.markdown-body table {
-    display:block;
-    max-width:100%;
-    overflow-x:auto;
-    border-collapse:collapse;
-}
-
-.markdown-body th,
-.markdown-body td {
-    border:1px solid var(--border);
-    padding:7px 9px;
-    text-align:left;
-}
-
-.markdown-body th { color:var(--text); }
-
-.markdown-body hr {
+    flex-direction:column;
+    min-height:calc(100vh - 102px);
     border:0;
-    border-top:1px solid var(--border);
-    margin:16px 0;
 }
-
-.markdown-body a {
-    color:var(--primary);
-    overflow-wrap:anywhere;
+.brand-icon {
+    border-radius:50%;
+    background:#ffffff18;
+    border:1px solid #ffffff55;
 }
-
-@media(max-width:760px) {
-    main { padding:24px 14px; }
-    .grid { grid-template-columns:1fr; }
-    header { padding:12px 14px; gap:10px; }
-    .brand { font-size:14px; }
-    .role { display:none; }
-    .card { padding:17px; }
-    h1 { font-size:27px; }
-    .composefoot { align-items:flex-start; flex-direction:column; }
+.nav-link.active { box-shadow:inset 3px 0 #fbbf24; }
+.topbar {
+    height:66px;
+    min-height:66px;
+    background:var(--surface);
+    border-top:0;
+    border-bottom:1px solid var(--border);
+    padding:0 clamp(16px,3vw,38px);
+}
+.topbar:after { content:none; }
+.page-heading h1 { color:var(--ink); }
+.primary { background:#123e76; }
+.gov-footer-accent {
+    height:5px;
+    background:linear-gradient(to right,#f59e0b 0 33%,#fff 33% 66%,#16834b 66% 100%);
+    border-radius:99px;
+    margin-top:16px;
+}
+@media(max-width:720px) {
+    .masthead-inner { min-height:70px; gap:10px; padding:10px 14px; }
+    .brand-copy { display:none; }
+    .brand-mark { width:42px; height:42px; flex-basis:42px; }
+    .brand-mark svg { width:32px; height:32px; }
+    .product-title h1 { font-size:16px; }
+    .product-title p { font-size:10px; }
+    .masthead-art { display:none; }
 }
 </style>
 </head>
-
 <body>
 
-<header>
-    <div class="brand">
-        <div class="logo">▤</div>
-        Government RAG Assistant
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="brand-mark" aria-hidden="true">
+      <!-- Project-created Ashoka Chakra motif; not an official Government emblem. -->
+      <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3">
+        <circle cx="50" cy="50" r="35"/><circle cx="50" cy="50" r="5"/>
+        <g stroke-width="2"><path d="M50 15V85M15 50H85M25.3 25.3L74.7 74.7M74.7 25.3L25.3 74.7M36.6 16.1L63.4 83.9M16.1 36.6L83.9 63.4M63.4 16.1L36.6 83.9M16.1 63.4L83.9 36.6"/></g>
+      </svg>
     </div>
-
-    <div class="actions">
-        <span class="muted role">Citizen workspace</span>
-        <button class="theme" id="themeToggle" type="button">☾ Dark mode</button>
-        <a class="linkbtn" href="/">Sign out</a>
+    <div class="brand-copy"><strong>भारत सरकार शैली</strong><span>Government-inspired project interface</span></div>
+    <div class="product-title"><h1>Government Document RAG Assistant</h1><p>Intelligent Retrieval of Government Documents</p></div>
+    <div class="masthead-art" aria-hidden="true">
+      <svg viewBox="0 0 190 65" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M8 54H182M20 52V34H170V52M30 34Q95 -3 160 34M39 34V52M55 29V52M72 24V52M95 20V52M118 24V52M135 29V52M151 34V52M15 55H175"/>
+        <path d="M95 9V2M95 2L104 5L95 8" stroke="#f59e0b"/>
+      </svg>
     </div>
+  </div>
+  <div class="tricolor"></div>
 </header>
 
-<main>
-    <div class="eyebrow">Ask · Discover · Understand</div>
-    <h1>Citizen information assistant</h1>
-    <p class="desc">Ask a question about government documents available in the knowledge base.</p>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="brand"><span class="brand-icon">⌕</span><span>GovDoc <b>AI</b></span></div>
+        <div class="nav-label">Workspace</div>
+        <a class="nav-link active" href="/user"><span class="nav-icon">▤</span>Citizen Assistant</a>
+        
+        <div class="sidebar-bottom"><span class="secure-dot">●</span>Answers grounded in your indexed documents.</div>
+    </aside>
 
-    <section class="card">
-        <div class="cardhead">
-            <div class="icon">✧</div>
-            <h2>Ask your question</h2>
-        </div>
-
-        <p class="desc">Be specific to help the assistant find relevant information.</p>
-
-        <form id="queryForm">
-            <textarea
-                id="query"
-                maxlength="4000"
-                placeholder="For example: What documents are required for this scheme?"
-                aria-label="Ask your question"
-                required
-            ></textarea>
-
-            <div class="composefoot">
-                <span class="count"><span id="charCount">0</span> / 4000 characters</span>
-                <button class="btn" id="askButton" type="submit">Ask question →</button>
+    <main class="main">
+        <header class="topbar">
+            <div class="crumb">Workspace <span aria-hidden="true">/</span> <strong>Citizen Assistant</strong></div>
+            <div class="top-right">
+                <span>Document intelligence</span>
+                <button class="theme" id="themeToggle" type="button" aria-label="Toggle color theme">☾ Dark mode</button>
+                <span class="avatar">G</span>
             </div>
-        </form>
+        </header>
 
-        <div class="status" id="status" role="status" aria-live="polite"></div>
-    </section>
-
-    <section class="grid">
-        <article class="card">
-            <div class="cardhead">
-                <div class="icon">✦</div>
-                <h2>Answer</h2>
+        <div class="content">
+            <div class="page-heading">
+                <div class="heading-icon">▤</div>
+                <div><h1>Government Document Assistant</h1><p>Find clear answers from uploaded government documents.</p></div>
             </div>
-            <p class="desc">Response generated from retrieved document context.</p>
-            <div class="answer markdown-body placeholder" id="answer">Your answer will appear here after you ask a question.</div>
-        </article>
 
-        <article class="card">
-            <div class="cardhead">
-                <div class="icon">文</div>
-                <h2>Detected language</h2>
-            </div>
-            <p class="desc">Language identified by the current pipeline.</p>
-            <div id="language" style="font-weight:700">—</div>
-        </article>
-    </section>
+            <section class="card question-card">
+                <div class="card-title-row">
+                    <div class="round-icon">✦</div>
+                    <div><h2>What would you like to know?</h2><p>Ask about policies, public services, guidelines, and official documents.</p></div>
+                </div>
+                <form id="questionForm">
+                    <label for="query" style="display:block;font-weight:700;font-size:13px;margin-bottom:8px">Your question</label>
+                    <textarea id="query" class="question-box" maxlength="4000" placeholder="e.g. What are the key guidelines for responsible AI in public services?" required></textarea>
+                    <div class="question-footer">
+                        <span class="hint"><span id="charCount">0</span> / 4000 characters · Ask one clear question for a more focused answer.</span>
+                        <button class="primary" id="askButton" type="submit"><span aria-hidden="true">➤</span> Ask question</button>
+                    </div>
+                    <div id="message" class="message" role="status" aria-live="polite"></div>
+                </form>
+                <div class="suggestions">
+                    <span class="suggestion-label">Try asking:</span>
+                    <button type="button" class="chip" data-prompt="What are the documents about?">Summarize the documents</button>
+                    <button type="button" class="chip" data-prompt="What are the data governance guidelines?">Data governance guidelines</button>
+                    <button type="button" class="chip" data-prompt="What do the documents say about consent and privacy?">Consent and privacy</button>
+                </div>
+            </section>
 
-    <section class="card" style="margin-top:18px">
-        <div class="cardhead">
-            <div class="icon">▤</div>
-            <h2>Retrieved sources</h2>
+            <section class="card answer-card" aria-live="polite">
+                <div class="answer-header">
+                    <div class="round-icon" style="background:var(--success-bg);color:var(--success)">▤</div>
+                    <h2>Answer</h2>
+                    <span id="answerStatus" class="answer-status">✓ Grounded in sources</span>
+                </div>
+                <div id="answer" class="answer-body"><div class="answer-placeholder"><strong>Your answer will appear here</strong>Ask a question to receive a response based on the documents available in the knowledge base.</div></div>
+                <div class="meta-row">
+                    <div class="meta-pill">Detected language: <strong id="language">—</strong></div>
+                    <div class="meta-pill">Sources retrieved: <strong id="sourceCount">0</strong></div>
+                </div>
+                <div class="source-section">
+                    <div class="source-title"><span>▤</span> Sources <span id="sourceLabel" style="color:var(--muted);font-weight:500">(0)</span></div>
+                    <div id="sources" class="source-grid"><div class="empty-sources">Sources used to generate the answer will appear here.</div></div>
+                </div>
+
+                <div class="feedback-panel" id="feedbackPanel">
+                    <div class="feedback-question">Was this answer helpful?</div>
+                    <div class="feedback-buttons">
+                        <button class="feedback-btn positive" id="helpfulFeedback" type="button">👍 Helpful</button>
+                        <button class="feedback-btn negative" id="notHelpfulFeedback" type="button">👎 Not helpful</button>
+                    </div>
+                    <div class="feedback-thanks" id="feedbackThanks" role="status" aria-live="polite">
+                        ✓ Thank you for your feedback!
+                    </div>
+                    <div class="feedback-note">Your feedback helps improve the quality of this assistant. This is a visual prototype; responses are not submitted or stored.</div>
+                </div>
+            </section>
+            <div class="gov-footer-accent" aria-hidden="true"></div>
+            <div class="footer">Government Document RAG Assistant · Citizen Portal</div>
         </div>
-        <p class="desc">Documents or passages returned by retrieval for this question.</p>
-        <div class="source-list" id="sources">
-            <div class="placeholder">No sources yet.</div>
+    </main>
+</div>
+
+<div class="feedback-modal-backdrop" id="feedbackModalBackdrop" aria-hidden="true">
+    <section class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedbackModalTitle">
+        <div class="feedback-modal-head">
+            <h3 id="feedbackModalTitle">Share Feedback</h3>
+            <button class="feedback-close" id="closeFeedbackModal" type="button" aria-label="Close">×</button>
+        </div>
+        <p><strong>What was wrong with this answer?</strong> (Select one or more)</p>
+        <div class="feedback-reasons">
+            <label class="feedback-reason"><input type="checkbox" value="Incorrect information"> Incorrect information</label>
+            <label class="feedback-reason"><input type="checkbox" value="Incomplete answer"> Incomplete answer</label>
+            <label class="feedback-reason"><input type="checkbox" value="Irrelevant answer"> Irrelevant answer</label>
+            <label class="feedback-reason"><input type="checkbox" value="Missing source / evidence"> Missing source / evidence</label>
+            <label class="feedback-reason"><input type="checkbox" value="Difficult to understand"> Difficult to understand</label>
+            <label class="feedback-reason"><input type="checkbox" value="Outdated information"> Outdated information</label>
+            <label class="feedback-reason"><input type="checkbox" value="Other"> Other (please specify)</label>
+        </div>
+        <label class="feedback-comment-label" for="feedbackComment">Additional comment (optional)</label>
+        <textarea class="feedback-comment" id="feedbackComment" maxlength="500" placeholder="Tell us what could be improved..."></textarea>
+        <div class="feedback-counter"><span id="feedbackCharCount">0</span> / 500</div>
+        <div class="feedback-modal-footer">
+            <button class="feedback-btn" id="cancelFeedback" type="button">Cancel</button>
+            <button class="primary" id="submitFeedbackVisual" type="button">Submit Feedback</button>
         </div>
     </section>
-
-    <div class="footer">Government RAG Assistant · AI-assisted document retrieval</div>
-</main>
+</div>
 
 <script>
 const root = document.documentElement;
 const themeToggle = document.getElementById("themeToggle");
+const queryInput = document.getElementById("query");
+const questionForm = document.getElementById("questionForm");
+const askButton = document.getElementById("askButton");
+const answerDiv = document.getElementById("answer");
+const languageDiv = document.getElementById("language");
+const sourcesDiv = document.getElementById("sources");
+const sourceCount = document.getElementById("sourceCount");
+const sourceLabel = document.getElementById("sourceLabel");
+const messageDiv = document.getElementById("message");
+const answerStatus = document.getElementById("answerStatus");
+const charCount = document.getElementById("charCount");
 
+// Preserve the Major GUI's saved light/dark theme preference.
 function applyTheme(theme) {
     root.dataset.theme = theme;
-
-    try {
-        localStorage.setItem("grag-theme", theme);
-    } catch (_) {}
-
-    themeToggle.textContent =
-        theme === "dark" ? "☀ Light mode" : "☾ Dark mode";
+    try { localStorage.setItem("grag-theme", theme); } catch (_) {}
+    themeToggle.textContent = theme === "dark" ? "☀ Light mode" : "☾ Dark mode";
 }
-
 let savedTheme = "light";
-
-try {
-    savedTheme = localStorage.getItem("grag-theme") || "light";
-} catch (_) {}
-
+try { savedTheme = localStorage.getItem("grag-theme") || "light"; } catch (_) {}
 applyTheme(savedTheme);
-
 themeToggle.addEventListener("click", () => {
     applyTheme(root.dataset.theme === "dark" ? "light" : "dark");
 });
 
-const query = document.getElementById("query");
-const counter = document.getElementById("charCount");
-const answer = document.getElementById("answer");
-const language = document.getElementById("language");
-const sources = document.getElementById("sources");
-const status = document.getElementById("status");
-const button = document.getElementById("askButton");
-
-query.addEventListener("input", () => {
-    counter.textContent = query.value.length;
+queryInput.addEventListener("input", () => { charCount.textContent = queryInput.value.length; });
+document.querySelectorAll("[data-prompt]").forEach(button => {
+    button.addEventListener("click", () => {
+        queryInput.value = button.dataset.prompt;
+        charCount.textContent = queryInput.value.length;
+        queryInput.focus();
+    });
 });
+questionForm.addEventListener("submit", askQuestion);
 
-function display(value, fallback) {
-    if (value === null || value === undefined || value === "") {
-        return fallback;
-    }
-
-    if (
-        typeof value === "string" ||
-        typeof value === "number" ||
-        typeof value === "boolean"
-    ) {
-        return String(value);
-    }
-
-    return JSON.stringify(value, null, 2);
+function showMessage(message, type) {
+    messageDiv.textContent = message || "";
+    messageDiv.className = "message" + (type ? " " + type : "");
+    messageDiv.style.display = message ? "block" : "none";
 }
 
-/*
- * Render Markdown safely. If the libraries cannot load,
- * show the original content as plain text instead.
- */
-function renderMarkdown(element, text) {
-    const value = String(text ?? "");
+function safeDisplay(value, fallback = "") {
+    if (value === null || value === undefined || value === "") return fallback;
+    if (["string", "number", "boolean"].includes(typeof value)) return String(value);
+    return "";
+}
 
+function getMetadata(source) {
+    return source && source.metadata && typeof source.metadata === "object" ? source.metadata : {};
+}
+function firstValue(...values) {
+    return values.find(value => value !== undefined && value !== null && value !== "");
+}
+function getSourceFields(source, index) {
+    const item = source && typeof source === "object" && !Array.isArray(source) ? source : { text: String(source ?? "") };
+    const metadata = getMetadata(item);
+    return {
+        item,
+        name: firstValue(item.document_name, metadata.document_name, item.source, metadata.source, item.file_name, metadata.file_name, item.filename, metadata.filename, "Retrieved document"),
+        page: firstValue(item.page_number, metadata.page_number, item.page, metadata.page),
+        text: firstValue(item.text, item.content, item.page_content, metadata.text, metadata.content, ""),
+        evidenceId: firstValue(item.evidence_id, metadata.evidence_id),
+        index
+    };
+}
+
+function renderMarkdown(element, markdown) {
+    const value = String(markdown ?? "");
+    // Marked creates HTML; DOMPurify sanitizes it before it enters the page.
     if (window.marked && window.DOMPurify) {
-        const html = window.marked.parse(value, {
-            gfm: true,
-            breaks: true
+        const html = window.marked.parse(value, { gfm: true, breaks: true });
+        element.innerHTML = window.DOMPurify.sanitize(html, {
+            USE_PROFILES: { html: true },
+            ALLOWED_ATTR: ["href", "title", "target", "rel"]
         });
-
-        element.innerHTML = window.DOMPurify.sanitize(html);
     } else {
         element.textContent = value;
     }
 }
 
-function textNode(text, className) {
-    const element = document.createElement("div");
-    element.className = className || "";
-    element.textContent = text;
-    return element;
+function fileType(name) {
+    const extension = String(name).split(".").pop().toUpperCase();
+    return ["PDF", "DOCX", "TXT"].includes(extension) ? extension : "DOC";
 }
 
-function renderSources(items) {
-    sources.replaceChildren();
+function displaySources(sourceItems) {
+    sourcesDiv.replaceChildren();
+    const list = Array.isArray(sourceItems) ? sourceItems : [];
+    sourceCount.textContent = String(list.length);
+    sourceLabel.textContent = `(${list.length})`;
 
-    if (!Array.isArray(items) || items.length === 0) {
-        sources.append(
-            textNode("No sources available for this response.", "placeholder")
-        );
-        return;
+    if (!list.length) {
+        sourcesDiv.innerHTML = '<div class="empty-sources">No sources were returned for this answer.</div>';
+        return new Set();
     }
 
-    items.forEach((source, index) => {
-        const card = document.createElement("div");
-        card.className = "source";
+    const validEvidenceIds = new Set();
+    list.forEach((source, index) => {
+        const fields = getSourceFields(source, index);
+        const { name, page, text, evidenceId } = fields;
+        const card = document.createElement("article");
+        card.className = "source-card";
 
-        card.append(
-            textNode("Source " + (index + 1), "source-title")
-        );
-
-        if (source && typeof source === "object" && !Array.isArray(source)) {
-            Object.entries(source).forEach(([key, value]) => {
-                const line = document.createElement("div");
-                line.className = "source-detail";
-
-                const label = document.createElement("span");
-                label.className = "source-key";
-                label.textContent = key + ": ";
-
-                line.append(label);
-
-                if (key.toLowerCase() === "text" && typeof value === "string") {
-                    const content = document.createElement("div");
-                    content.className = "markdown-body";
-                    renderMarkdown(content, value);
-                    line.append(content);
-                } else {
-                    line.append(
-                        document.createTextNode(display(value, "—"))
-                    );
-                }
-
-                card.append(line);
-            });
-        } else {
-            const content = document.createElement("div");
-            content.className = "markdown-body source-detail";
-            renderMarkdown(content, display(source, "—"));
-            card.append(content);
+        if (typeof evidenceId === "string" && /^E\d{3}$/.test(evidenceId)) {
+            card.id = `source-${evidenceId}`;
+            validEvidenceIds.add(evidenceId);
         }
 
-        sources.append(card);
+        const top = document.createElement("div");
+        top.className = "source-top";
+        const icon = document.createElement("div");
+        icon.className = "pdf-icon";
+        icon.textContent = fileType(name);
+        const info = document.createElement("div");
+        info.className = "source-info";
+        const title = document.createElement("div");
+        title.className = "source-name";
+        title.textContent = name;
+        const pageText = document.createElement("div");
+        pageText.className = "source-page";
+        pageText.textContent = page !== undefined ? `Page ${page}` : `Source ${index + 1}`;
+        info.append(title, pageText);
+
+        if (typeof evidenceId === "string" && /^E\d{3}$/.test(evidenceId)) {
+            const badge = document.createElement("span");
+            badge.className = "evidence-badge";
+            badge.textContent = `[${evidenceId}]`;
+            info.appendChild(badge);
+        }
+        top.append(icon, info);
+        card.appendChild(top);
+
+        if (text) {
+            const fullTextValue = String(text);
+            const preview = document.createElement("p");
+            preview.className = "source-excerpt";
+            preview.textContent = fullTextValue.length > 260 ? fullTextValue.slice(0, 260).trim() + "…" : fullTextValue;
+            card.appendChild(preview);
+
+            const fullText = document.createElement("div");
+            fullText.className = "source-full-text";
+            fullText.textContent = fullTextValue;
+            card.appendChild(fullText);
+
+            if (fullTextValue.length > 260) {
+                const toggle = document.createElement("button");
+                toggle.type = "button";
+                toggle.className = "source-toggle";
+                toggle.textContent = "Show full text";
+                toggle.addEventListener("click", () => {
+                    const expanded = card.classList.toggle("expanded");
+                    toggle.textContent = expanded ? "Show less" : "Show full text";
+                });
+                card.appendChild(toggle);
+            }
+        }
+        sourcesDiv.appendChild(card);
+    });
+    return validEvidenceIds;
+}
+
+// Convert [E001] text markers into links only when a matching source card exists.
+// This runs on the already-sanitized Markdown DOM and uses DOM nodes, not HTML strings.
+function linkEvidenceReferences(container, validEvidenceIds) {
+    if (!validEvidenceIds.size) return;
+
+    const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+            // Match both [E001] and grouped citations such as [E001, E002].
+            if (!/\[\s*E\d{3}(?:\s*,\s*E\d{3})*\s*\]/.test(node.nodeValue || "")) {
+                return NodeFilter.FILTER_REJECT;
+            }
+
+            const parent = node.parentElement;
+            if (parent && ["A", "CODE", "PRE", "SCRIPT", "STYLE"].includes(parent.tagName)) {
+                return NodeFilter.FILTER_REJECT;
+            }
+            return NodeFilter.FILTER_ACCEPT;
+        }
+    });
+
+    const textNodes = [];
+    while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+    // Capture the complete bracketed group, then link each ID independently.
+    const pattern = /\[\s*(E\d{3}(?:\s*,\s*E\d{3})*)\s*\]/g;
+
+    textNodes.forEach(node => {
+        const value = node.nodeValue;
+        let lastIndex = 0;
+        let match;
+        const fragment = document.createDocumentFragment();
+
+        pattern.lastIndex = 0;
+        while ((match = pattern.exec(value)) !== null) {
+            fragment.appendChild(document.createTextNode(value.slice(lastIndex, match.index)));
+
+            const evidenceIds = match[1].split(/\s*,\s*/);
+            fragment.appendChild(document.createTextNode("["));
+
+            evidenceIds.forEach((evidenceId, index) => {
+                if (index > 0) {
+                    fragment.appendChild(document.createTextNode(", "));
+                }
+
+                if (validEvidenceIds.has(evidenceId)) {
+                    const link = document.createElement("a");
+                    link.href = `#source-${evidenceId}`;
+                    link.className = "evidence-link";
+                    link.textContent = evidenceId;
+
+                    link.addEventListener("click", () => {
+                        const card = document.getElementById(`source-${evidenceId}`);
+                        if (card) {
+                            card.classList.add("expanded", "highlighted");
+                            const toggle = card.querySelector(".source-toggle");
+                            if (toggle) toggle.textContent = "Show less";
+                            window.setTimeout(() => card.classList.remove("highlighted"), 1800);
+                        }
+                    });
+
+                    fragment.appendChild(link);
+                } else {
+                    // Keep unknown IDs visible as plain text; never link to a missing source.
+                    fragment.appendChild(document.createTextNode(evidenceId));
+                }
+            });
+
+            fragment.appendChild(document.createTextNode("]"));
+            lastIndex = pattern.lastIndex;
+        }
+
+        fragment.appendChild(document.createTextNode(value.slice(lastIndex)));
+        node.parentNode.replaceChild(fragment, node);
     });
 }
 
-function setStatus(message, type) {
-    status.textContent = message || "";
-    status.className = "status" + (type ? " " + type : "");
-}
-
-document.getElementById("queryForm").addEventListener("submit", async event => {
+async function askQuestion(event) {
     event.preventDefault();
-
-    const q = query.value.trim();
-
-    if (!q) {
-        setStatus("Please enter a question.", "error");
+    const query = queryInput.value.trim();
+    if (!query) {
+        showMessage("Please enter a question before submitting.", "error");
+        queryInput.focus();
         return;
     }
 
-    button.disabled = true;
-    button.textContent = "Searching…";
-
-    answer.classList.add("placeholder");
-    answer.textContent = "Finding relevant information…";
-    language.textContent = "—";
-
-    sources.replaceChildren(
-        textNode("Retrieving sources…", "placeholder")
-    );
-
-    setStatus("Searching the document knowledge base…");
+    resetFeedbackVisual();
+    askButton.disabled = true;
+    askButton.textContent = "Searching documents…";
+    showMessage("Searching the knowledge base and preparing an answer…", "info");
+    answerDiv.textContent = "Processing your question…";
+    languageDiv.textContent = "—";
+    sourcesDiv.innerHTML = '<div class="empty-sources">Retrieving relevant sources…</div>';
+    sourceCount.textContent = "—";
+    sourceLabel.textContent = "(retrieving…)";
+    answerStatus.style.display = "none";
 
     try {
+        // Preserve the existing Major Project endpoint and request contract.
         const response = await fetch("/user/query", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ query: q })
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ query })
         });
-
         let data;
-
-        try {
-            data = await response.json();
-        } catch (_) {
-            throw new Error(
-                "Unexpected server response (HTTP " + response.status + ")."
-            );
-        }
-
+        try { data = await response.json(); }
+        catch (_) { throw new Error("The server returned an unreadable response."); }
         if (!response.ok || !data.success) {
-            throw new Error(
-                data.message || "The question could not be processed."
-            );
+            throw new Error(data.message || "Unable to answer this question.");
         }
 
+        // Preserve the existing Major response structure: data.result.answer/language/sources.
         const result = data.result || {};
+        const sources = Array.isArray(result.sources) ? result.sources : [];
+        const validEvidenceIds = displaySources(sources);
 
-        // Render Markdown instead of displaying literal ** markers.
-        renderMarkdown(
-            answer,
-            display(result.answer, "No answer was returned.")
-        );
-
-        answer.classList.remove("placeholder");
-
-        language.textContent = display(result.language, "Not detected");
-
-        // Render Markdown inside source text fields as well.
-        renderSources(result.sources);
-
-        setStatus("Answer generated.", "success");
-
+        answerDiv.replaceChildren();
+        renderMarkdown(answerDiv, safeDisplay(result.answer, "No answer was returned."));
+        linkEvidenceReferences(answerDiv, validEvidenceIds);
+        languageDiv.textContent = safeDisplay(result.language, "Not detected");
+        answerStatus.style.display = "inline-flex";
+        showMessage("", "");
     } catch (error) {
-        answer.textContent =
-            error.message || "Could not connect to Flask. Check the server.";
-
-        answer.classList.remove("placeholder");
-        language.textContent = "—";
-
-        sources.replaceChildren(
-            textNode("Sources unavailable.", "placeholder")
-        );
-
-        setStatus(error.message || "Request failed.", "error");
-
+        answerDiv.textContent = error.message || "Error connecting to Flask server.";
+        languageDiv.textContent = "—";
+        sourcesDiv.innerHTML = '<div class="empty-sources">Sources are unavailable because the request did not complete.</div>';
+        sourceCount.textContent = "0";
+        sourceLabel.textContent = "(0)";
+        answerStatus.style.display = "none";
+        showMessage(error.message || "Error connecting to Flask server.", "error");
+        console.error(error);
     } finally {
-        button.disabled = false;
-        button.textContent = "Ask question →";
+        askButton.disabled = false;
+        askButton.innerHTML = '<span aria-hidden="true">➤</span> Ask question';
     }
+}
+
+// Feedback wireframe interactions only: no fetch(), Flask route, or database integration.
+const helpfulFeedback = document.getElementById("helpfulFeedback");
+const notHelpfulFeedback = document.getElementById("notHelpfulFeedback");
+const feedbackThanks = document.getElementById("feedbackThanks");
+const feedbackBackdrop = document.getElementById("feedbackModalBackdrop");
+const feedbackComment = document.getElementById("feedbackComment");
+const feedbackCharCount = document.getElementById("feedbackCharCount");
+const closeFeedbackModal = document.getElementById("closeFeedbackModal");
+const cancelFeedback = document.getElementById("cancelFeedback");
+const submitFeedbackVisual = document.getElementById("submitFeedbackVisual");
+
+function closeFeedbackDialog() {
+    feedbackBackdrop.classList.remove("visible");
+    feedbackBackdrop.setAttribute("aria-hidden", "true");
+}
+function resetFeedbackVisual() {
+    helpfulFeedback.disabled = false;
+    notHelpfulFeedback.disabled = false;
+    helpfulFeedback.classList.remove("selected");
+    notHelpfulFeedback.classList.remove("selected");
+    feedbackThanks.classList.remove("visible");
+    if (feedbackComment) feedbackComment.value = "";
+    if (feedbackCharCount) feedbackCharCount.textContent = "0";
+    if (feedbackBackdrop) {
+        feedbackBackdrop.querySelectorAll('input[type="checkbox"]').forEach(input => input.checked = false);
+    }
+    if (feedbackBackdrop) closeFeedbackDialog();
+}
+helpfulFeedback.addEventListener("click", () => {
+    helpfulFeedback.disabled = true;
+    notHelpfulFeedback.disabled = true;
+    helpfulFeedback.classList.add("selected");
+    feedbackThanks.textContent = "✓ Thank you for your feedback!";
+    feedbackThanks.classList.add("visible");
 });
+notHelpfulFeedback.addEventListener("click", () => {
+    feedbackBackdrop.classList.add("visible");
+    feedbackBackdrop.setAttribute("aria-hidden", "false");
+    feedbackComment.focus();
+});
+feedbackComment.addEventListener("input", () => {
+    feedbackCharCount.textContent = String(feedbackComment.value.length);
+});
+closeFeedbackModal.addEventListener("click", closeFeedbackDialog);
+cancelFeedback.addEventListener("click", closeFeedbackDialog);
+feedbackBackdrop.addEventListener("click", event => {
+    if (event.target === feedbackBackdrop) closeFeedbackDialog();
+});
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && feedbackBackdrop.classList.contains("visible")) closeFeedbackDialog();
+});
+submitFeedbackVisual.addEventListener("click", () => {
+    closeFeedbackDialog();
+    helpfulFeedback.disabled = true;
+    notHelpfulFeedback.disabled = true;
+    notHelpfulFeedback.classList.add("selected");
+    feedbackThanks.textContent = "✓ Thank you for your feedback!";
+    feedbackThanks.classList.add("visible");
+});
+
 </script>
+
+
 
 </body>
 </html>

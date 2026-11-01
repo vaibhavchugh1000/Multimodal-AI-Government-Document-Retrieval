@@ -7,6 +7,10 @@ import pymupdf
 from pathlib import Path
 
 
+# Set to True temporarily for detailed per-page diagnostics.
+DEBUG_PDF_LOADER = False
+
+
 IMAGE_VISION_PROMPT="""
 Analyze this image from a government document.
 
@@ -119,6 +123,7 @@ def load_pdf(pdf_path : str) :
             
             # complex page 
             text_source="pdf_text+page_vision"
+            
             pixmap=page.get_pixmap(dpi=200)
             image_bytes=pixmap.tobytes("png")
             
@@ -166,7 +171,22 @@ def load_pdf(pdf_path : str) :
         })
         
         
-        print()
+        if DEBUG_PDF_LOADER:
+            print("page_number:", pages[-1]["page_number"])
+            print("page_type:", pages[-1]["page_type"])
+            print("text_source:", pages[-1]["text_source"])
+            print("has_images:", pages[-1]["has_images"])
+            print("image_count:", pages[-1]["image_count"])
+            print("drawing_count:", pages[-1]["drawing_count"])
+            print("text:", pages[-1]["text"][:1000])
+            print("document_type:", pages[-1]["document_type"])
+            print("document_name:", pages[-1]["document_name"])
+            print("document_path:", pages[-1]["document_path"])
+            print("document_id:", pages[-1]["document_id"])
+            print()
+        else:
+            print(pages[-1])
+            print()
 
     document.close()
 

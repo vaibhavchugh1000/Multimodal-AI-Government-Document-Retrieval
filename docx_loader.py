@@ -19,7 +19,8 @@ def load_docx(docx_path) :
                               "document_name" : document_name,
                               "document_id" : document_id,
                               "document_path" : str(docx_path),
-                              "document_type" : "docx"})
+                              "document_type" : "docx",
+                              })
         
     print("successfully loaded docx file : ",docx_path)
     return paragraphs

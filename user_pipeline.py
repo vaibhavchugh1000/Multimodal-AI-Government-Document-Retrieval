@@ -35,7 +35,8 @@ def user_query_pipeline(query):
         query,
         top_k=10
     )
-
+    
+        
     # Step 4: Build the prompt using the query and
     # retrieved government document context
     prompt = build_prompt(
@@ -47,6 +48,7 @@ def user_query_pipeline(query):
     # Step 5: Send the prompt to the LLM
     answer = generate_response(prompt)
 
+    
     # Step 6: Return the complete result
     return {
         "query": query,
@@ -54,3 +56,5 @@ def user_query_pipeline(query):
         "answer": answer,
         "sources": retrieved_documents
     }
+    
+    

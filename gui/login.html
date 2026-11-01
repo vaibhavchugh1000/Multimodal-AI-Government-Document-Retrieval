@@ -1,25 +1,25 @@
-
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Government RAG Assistant | Sign in</title>
+    <title>Government Document RAG Assistant | Sign in</title>
 
     <style>
         :root {
             color-scheme: light;
-            --bg: #f2f6fc;
+            --bg: #f3f6fb;
             --surface: #ffffff;
             --surface2: #f8faff;
-            --text: #17263d;
-            --muted: #687991;
-            --border: #dfe7f1;
-            --primary: #1769d2;
-            --soft: #eaf3ff;
+            --text: #14233d;
+            --muted: #64748b;
+            --border: #dce4ef;
+            --primary: #12376a;
+            --primary-hover: #0b2a54;
+            --soft: #edf3fb;
             --danger: #b42318;
             --success: #16845b;
-            --shadow: 0 12px 35px #1a355512;
+            --shadow: 0 18px 48px #18365b18;
         }
 
         [data-theme="dark"] {
@@ -30,34 +30,79 @@
             --text: #edf4ff;
             --muted: #a7b7cc;
             --border: #2a3d54;
-            --primary: #4c9aff;
+            --primary: #315f9d;
+            --primary-hover: #3d70b4;
             --soft: #1b3452;
-            --danger: #ff9c96;
-            --success: #5ed4a3;
-            --shadow: 0 12px 35px #0003;
+            --danger: #ffaaa4;
+            --success: #68d9ad;
+            --shadow: 0 18px 48px #0005;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             min-height: 100vh;
             margin: 0;
-            padding: 76px 20px 30px;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            background:
+                radial-gradient(circle at 12% 12%, #ff99331a, transparent 25%),
+                radial-gradient(circle at 88% 88%, #13880815, transparent 25%),
+                var(--bg);
+            color: var(--text);
+            font: 14px/1.6 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+            transition: background .2s, color .2s;
+        }
+
+        .topbar {
+            width: min(100%, 1120px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 0;
+        }
+
+        .brand-mark {
+            width: 58px;
+            height: 58px;
+            flex: 0 0 58px;
             display: grid;
             place-items: center;
-            background: var(--bg);
-            color: var(--text);
-            font: 14px/1.6 Inter, system-ui, -apple-system,
-                  "Segoe UI", sans-serif;
-            transition: background 0.2s, color 0.2s;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: var(--surface);
+            box-shadow: 0 5px 16px #18365b12;
+        }
+
+        .brand-copy strong {
+            display: block;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(17px, 2.4vw, 24px);
+            line-height: 1.2;
+            letter-spacing: -.25px;
+        }
+
+        .brand-copy span {
+            display: block;
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 12px;
+            letter-spacing: .2px;
         }
 
         .theme-toggle {
-            position: fixed;
-            top: 20px;
-            right: 22px;
+            flex: 0 0 auto;
             padding: 9px 13px;
             border: 1px solid var(--border);
             border-radius: 9px;
@@ -68,82 +113,137 @@
             cursor: pointer;
         }
 
+        .tricolor {
+            width: min(100%, 1120px);
+            height: 5px;
+            display: flex;
+            overflow: hidden;
+            border-radius: 99px;
+            box-shadow: 0 2px 7px #18365b12;
+        }
+        .tricolor span { flex: 1; }
+        .tricolor span:nth-child(1) { background: #ff9933; }
+        .tricolor span:nth-child(2) { background: #ffffff; }
+        .tricolor span:nth-child(3) { background: #138808; }
+
         .shell {
-            width: min(100%, 920px);
-            min-height: 530px;
+            width: min(100%, 1120px);
+            min-height: 590px;
             display: grid;
-            grid-template-columns: 0.9fr 1.1fr;
-            background: var(--surface);
+            grid-template-columns: 1fr 1fr;
+            overflow: hidden;
             border: 1px solid var(--border);
             border-radius: 22px;
-            overflow: hidden;
+            background: var(--surface);
             box-shadow: var(--shadow);
         }
 
         .hero {
+            position: relative;
+            min-height: 590px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            padding: 44px;
-            color: #ffffff;
-            background: linear-gradient(
-                145deg, #103766, #1769d2 75%, #0c2a4e
-            );
+            justify-content: flex-end;
+            overflow: hidden;
+            padding: 42px;
+            color: #fff;
+            background: linear-gradient(145deg, #12376a, #0b2548 75%, #071b35);
         }
 
-        .seal {
-            width: 48px;
-            height: 48px;
+        .building-art {
+            position: absolute;
+            inset: 0 0 auto;
+            height: 66%;
             display: grid;
             place-items: center;
-            border: 1px solid #ffffff75;
-            border-radius: 14px;
-            font-size: 24px;
+            opacity: .98;
+            background:
+                linear-gradient(180deg, #6da9dc 0%, #c8e0f3 54%, #7899a9 100%);
+        }
+
+        .building-art::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 45%, #0b2548 100%);
+        }
+
+        .building-art svg {
+            width: 100%;
+            height: 100%;
+            max-height: 420px;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 440px;
+            padding-top: 230px;
+        }
+
+        .project-label {
+            display: inline-block;
+            margin-bottom: 13px;
+            padding: 5px 10px;
+            border: 1px solid #ffffff55;
+            border-radius: 99px;
+            color: #fff;
+            background: #ffffff17;
+            font-size: 10px;
+            font-weight: 750;
+            letter-spacing: 1.1px;
+            text-transform: uppercase;
         }
 
         .hero h1 {
-            margin: 24px 0 14px;
-            font-size: 38px;
-            line-height: 1.12;
-            letter-spacing: -0.8px;
+            margin: 0 0 12px;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(30px, 4vw, 42px);
+            line-height: 1.1;
+            letter-spacing: -.6px;
         }
 
         .hero p {
-            max-width: 290px;
-            color: #dceaff;
+            max-width: 390px;
+            margin: 0;
+            color: #e2edfa;
+            font-size: 15px;
         }
 
-        .herofoot {
-            color: #c7dcf8;
-            font-size: 11px;
-            letter-spacing: 0.5px;
+        .hero-rule {
+            width: 64px;
+            height: 4px;
+            margin: 18px 0;
+            border-radius: 5px;
+            background: linear-gradient(90deg, #ff9933 0 33%, #fff 33% 66%, #138808 66%);
         }
 
         .formwrap {
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: clamp(28px, 6vw, 62px);
+            padding: clamp(30px, 5vw, 66px);
         }
 
         .eyebrow {
             color: var(--primary);
             font-size: 11px;
             font-weight: 800;
-            letter-spacing: 1.4px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
         }
 
         .formwrap h2 {
-            margin: 6px 0;
-            font-size: 30px;
-            letter-spacing: -0.7px;
+            margin: 7px 0 4px;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 34px;
+            letter-spacing: -.7px;
         }
 
         .desc {
-            margin: 4px 0 18px;
+            margin: 4px 0 25px;
             color: var(--muted);
-            font-size: 13px;
+            font-size: 14px;
         }
 
         label {
@@ -156,8 +256,8 @@
         input {
             display: block;
             width: 100%;
-            min-height: 46px;
-            padding: 12px 13px;
+            min-height: 49px;
+            padding: 12px 14px;
             border: 1px solid var(--border);
             border-radius: 10px;
             outline: none;
@@ -167,43 +267,62 @@
         }
 
         input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px
-                color-mix(in srgb, var(--primary) 15%, transparent);
+            border-color: #4776ad;
+            box-shadow: 0 0 0 3px #4776ad24;
         }
 
         .btn {
             width: 100%;
-            margin-top: 23px;
+            min-height: 49px;
+            margin-top: 25px;
             padding: 12px 16px;
             border: 0;
-            border-radius: 9px;
+            border-radius: 10px;
             background: var(--primary);
-            color: #ffffff;
+            color: #fff;
             font: inherit;
             font-weight: 750;
             cursor: pointer;
+            transition: background .15s, transform .15s;
         }
 
-        .btn:hover {
-            filter: brightness(1.06);
-        }
-
-        .btn:disabled {
-            opacity: 0.65;
-            cursor: wait;
-        }
+        .btn:hover { background: var(--primary-hover); }
+        .btn:active { transform: translateY(1px); }
+        .btn:disabled { opacity: .65; cursor: wait; }
 
         #result {
             min-height: 22px;
-            margin-top: 12px;
+            margin-top: 13px;
             font-size: 13px;
+            line-height: 1.5;
             overflow-wrap: anywhere;
         }
 
-        .hint {
-            margin-top: 18px;
-            padding: 12px;
+        #result.error {
+            padding: 11px 13px;
+            border: 1px solid #fecdca;
+            border-radius: 9px;
+            color: var(--danger);
+            background: #fef3f2;
+        }
+
+        #result.success {
+            padding: 11px 13px;
+            border: 1px solid #abefc6;
+            border-radius: 9px;
+            color: var(--success);
+            background: #ecfdf3;
+        }
+
+        [data-theme="dark"] #result.error { background: #4a2428; border-color: #754047; }
+        [data-theme="dark"] #result.success { background: #173c32; border-color: #28634f; }
+
+        .notice {
+            margin-top: 17px;
+            padding: 13px 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
             border: 1px solid var(--border);
             border-radius: 10px;
             background: var(--soft);
@@ -211,157 +330,154 @@
             font-size: 12px;
         }
 
-        .hint strong {
-            color: var(--text);
-        }
-
-        code {
-            color: var(--primary);
-        }
+        .notice strong { color: var(--text); }
 
         .footer {
-            margin-top: 24px;
+            margin-top: 25px;
             color: var(--muted);
             font-size: 11px;
             text-align: center;
         }
 
-        @media (max-width: 680px) {
-            body {
-                padding: 76px 14px 20px;
-            }
+        @media (max-width: 760px) {
+            body { padding: 16px 12px 22px; gap: 16px; }
+            .brand-mark { width: 48px; height: 48px; flex-basis: 48px; }
+            .brand-copy span { max-width: 230px; }
+            .shell { grid-template-columns: 1fr; }
+            .hero { min-height: 390px; padding: 28px; }
+            .building-art { height: 68%; }
+            .hero-content { padding-top: 185px; }
+            .hero h1 { font-size: 32px; }
+            .formwrap { padding: 30px 26px; }
+        }
 
-            .shell {
-                grid-template-columns: 1fr;
-            }
-
-            .hero {
-                min-height: 220px;
-                padding: 26px;
-            }
-
-            .hero h1 {
-                margin: 15px 0 8px;
-                font-size: 29px;
-            }
-
-            .herofoot {
-                margin-top: 20px;
-            }
-
-            .formwrap {
-                padding: 28px;
-            }
-
-            .theme-toggle {
-                top: 14px;
-                right: 14px;
-            }
+        @media (max-width: 420px) {
+            .brand { gap: 9px; }
+            .brand-copy strong { font-size: 16px; }
+            .brand-copy span { font-size: 10px; }
+            .theme-toggle { padding: 8px 9px; font-size: 12px; }
+            .hero { min-height: 350px; }
+            .hero-content { padding-top: 160px; }
         }
 
         @media (prefers-reduced-motion: reduce) {
-            * {
-                transition: none !important;
-            }
+            *, *::before, *::after { transition: none !important; }
         }
     </style>
 </head>
 
 <body>
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-mark" aria-hidden="true">
+                <!-- Stylised government-building mark; not an official government emblem. -->
+                <svg viewBox="0 0 64 64" width="43" height="43" fill="none"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7 24L32 10L57 24H7Z" fill="#12376A"/>
+                    <path d="M12 27H52M9 51H55M6 56H58" stroke="#12376A" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M15 28V49M24 28V49M32 28V49M40 28V49M49 28V49"
+                          stroke="#12376A" stroke-width="4"/>
+                    <path d="M4 24H60" stroke="#FF9933" stroke-width="2.5"/>
+                    <path d="M8 53H56" stroke="#138808" stroke-width="2.5"/>
+                </svg>
+            </div>
+            <div class="brand-copy">
+                <strong>Government Document RAG Assistant</strong>
+                <span>Intelligent retrieval of government documents</span>
+            </div>
+        </div>
 
-    <button
-        class="theme-toggle"
-        id="themeToggle"
-        type="button"
-        aria-label="Toggle colour theme"
-    >
-        ☾ Dark mode
-    </button>
+        <button class="theme-toggle" id="themeToggle" type="button"
+                aria-label="Toggle color theme">☾ Dark mode</button>
+    </header>
+
+    <div class="tricolor" aria-hidden="true"><span></span><span></span><span></span></div>
 
     <main class="shell">
-
-        <section class="hero">
-            <div>
-                <div class="seal">▤</div>
-
-                <h1>
-                    Government<br>
-                    RAG Assistant
-                </h1>
-
-                <p>
-                    Find information in government documents with
-                    AI-powered search and retrieval.
-                </p>
+        <section class="hero" aria-label="Project introduction">
+            <div class="building-art" aria-hidden="true">
+                <!-- Decorative illustration inspired by Indian public architecture. -->
+                <svg viewBox="0 0 700 430" preserveAspectRatio="xMidYMid slice"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0" stop-color="#75B7EA"/>
+                            <stop offset="1" stop-color="#D8EAF6"/>
+                        </linearGradient>
+                        <linearGradient id="stone" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0" stop-color="#F5E8CC"/>
+                            <stop offset="1" stop-color="#C9B58E"/>
+                        </linearGradient>
+                    </defs>
+                    <rect width="700" height="430" fill="url(#sky)"/>
+                    <circle cx="570" cy="72" r="34" fill="#FFF3C4" opacity=".8"/>
+                    <path d="M0 330H700V430H0Z" fill="#73966B"/>
+                    <path d="M65 235H635V365H65Z" fill="url(#stone)" stroke="#A58D68" stroke-width="4"/>
+                    <path d="M35 235L350 178L665 235Z" fill="#E9D8B7" stroke="#A58D68" stroke-width="4"/>
+                    <path d="M245 181Q350 65 455 181Z" fill="#D9C39B" stroke="#A58D68" stroke-width="4"/>
+                    <path d="M285 180Q350 100 415 180Z" fill="#F0E1C2"/>
+                    <path d="M330 88H370V180H330Z" fill="#D7C29D"/>
+                    <path d="M350 42V88" stroke="#4C5C70" stroke-width="3"/>
+                    <path d="M352 45L395 57L352 70Z" fill="#FF9933"/>
+                    <path d="M352 70L395 82L352 94Z" fill="#138808"/>
+                    <path d="M90 255H610V276H90Z" fill="#B69E76"/>
+                    <g fill="#637D91">
+                        <path d="M115 288H145V355H115Z"/><path d="M190 288H220V355H190Z"/>
+                        <path d="M265 288H295V355H265Z"/><path d="M405 288H435V355H405Z"/>
+                        <path d="M480 288H510V355H480Z"/><path d="M555 288H585V355H555Z"/>
+                    </g>
+                    <g fill="#E8D8B9" stroke="#A58D68" stroke-width="3">
+                        <path d="M305 275H395V365H305Z"/>
+                        <path d="M300 275Q350 205 400 275Z"/>
+                    </g>
+                    <path d="M0 366Q180 340 350 370T700 365V430H0Z" fill="#456D48"/>
+                    <g fill="#2F6740">
+                        <circle cx="55" cy="325" r="40"/><circle cx="650" cy="322" r="46"/>
+                        <circle cx="170" cy="365" r="22"/><circle cx="535" cy="370" r="25"/>
+                    </g>
+                </svg>
             </div>
 
-            <div class="herofoot">
-                DIGITAL DOCUMENT INTELLIGENCE · GOVERNMENT INFORMATION
+            <div class="hero-content">
+                <span class="project-label">Academic project prototype</span>
+                <h1>Government Document<br>RAG Assistant</h1>
+                <div class="hero-rule"></div>
+                <p>
+                    AI-powered access to government schemes, policies, circulars,
+                    and procedural guidance through intelligent document retrieval.
+                </p>
             </div>
         </section>
 
         <section class="formwrap">
-
             <div class="eyebrow">Secure workspace</div>
-
-            <h2>Welcome back</h2>
-
-            <p class="desc">
-                Sign in to continue to your workspace.
-            </p>
+            <h2>Sign in</h2>
+            <p class="desc">Enter your credentials to continue to your workspace.</p>
 
             <form id="loginForm">
-
                 <label for="userId">User ID</label>
-
-                <input
-                    id="userId"
-                    name="userId"
-                    type="text"
-                    autocomplete="username"
-                    placeholder="Enter your ID"
-                    required
-                >
+                <input id="userId" name="userId" type="text"
+                       autocomplete="username" placeholder="Enter your user ID" required>
 
                 <label for="password">Password</label>
+                <input id="password" name="password" type="password"
+                       autocomplete="current-password" placeholder="Enter your password" required>
 
-                <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autocomplete="current-password"
-                    placeholder="Enter your password"
-                    required
-                >
-
-                <button
-                    class="btn"
-                    id="loginButton"
-                    type="submit"
-                >
-                    Sign in →
-                </button>
-
+                <button class="btn" id="loginButton" type="submit">Sign in&nbsp; →</button>
             </form>
 
-            <div
-                id="result"
-                role="status"
-                aria-live="polite"
-            ></div>
+            <div id="result" role="status" aria-live="polite"></div>
 
-            <div class="hint">
-                <strong>Demo access</strong><br>
-                Admin: <code>admin</code> / <code>admin</code><br>
-                User: <code>user</code> / <code>user</code>
+            <div class="notice">
+                <span aria-hidden="true">ⓘ</span>
+                <div><strong>Project prototype.</strong> This interface is an academic
+                    demonstration and is not an official Government of India website.</div>
             </div>
 
             <div class="footer">
-                Government RAG Assistant · AI-assisted document retrieval
+                Government Document RAG Assistant · AI-assisted document retrieval
             </div>
-
         </section>
-
     </main>
 
     <script>
@@ -370,17 +486,10 @@
 
         function applyTheme(theme) {
             root.dataset.theme = theme;
-
-            themeToggle.textContent =
-                theme === "dark"
-                    ? "☀ Light mode"
-                    : "☾ Dark mode";
-
+            themeToggle.textContent = theme === "dark" ? "☀ Light mode" : "☾ Dark mode";
             themeToggle.setAttribute(
                 "aria-label",
-                theme === "dark"
-                    ? "Switch to light mode"
-                    : "Switch to dark mode"
+                theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
             );
 
             try {
@@ -391,7 +500,6 @@
         }
 
         let savedTheme = "light";
-
         try {
             savedTheme = localStorage.getItem("grag-theme") || "light";
         } catch (error) {
@@ -401,70 +509,76 @@
         applyTheme(savedTheme);
 
         themeToggle.addEventListener("click", () => {
-            applyTheme(
-                root.dataset.theme === "dark" ? "light" : "dark"
-            );
+            applyTheme(root.dataset.theme === "dark" ? "light" : "dark");
         });
 
-        document
-            .getElementById("loginForm")
-            .addEventListener("submit", async event => {
-                event.preventDefault();
+        const form = document.getElementById("loginForm");
+        const result = document.getElementById("result");
+        const button = document.getElementById("loginButton");
 
-                const result = document.getElementById("result");
-                const button = document.getElementById("loginButton");
+        form.addEventListener("submit", async event => {
+            event.preventDefault();
 
-                const userId =
-                    document.getElementById("userId").value.trim();
+            const userId = document.getElementById("userId").value.trim();
+            const password = document.getElementById("password").value;
 
-                const password =
-                    document.getElementById("password").value;
+            if (!userId || !password) {
+                showMessage("Please enter your user ID and password.", "error");
+                return;
+            }
 
-                result.textContent = "";
-                result.style.color = "var(--danger)";
+            button.disabled = true;
+            button.textContent = "Signing in…";
+            result.textContent = "";
+            result.className = "";
 
-                button.disabled = true;
-                button.textContent = "Signing in…";
+            try {
+                const response = await fetch("/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: userId, password })
+                });
 
+                let data;
                 try {
-                    const response = await fetch("/login", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            id: userId,
-                            password: password
-                        })
-                    });
-
-                    const data = await response.json();
-
-                    if (!response.ok || !data.success) {
-                        throw new Error(
-                            data.message || "Unable to sign in."
-                        );
-                    }
-
-                    if (data.role === "admin") {
-                        window.location.href = "/admin";
-                    } else if (data.role === "user") {
-                        window.location.href = "/user";
-                    } else {
-                        throw new Error("Unknown user role.");
-                    }
-
-                } catch (error) {
-                    result.textContent =
-                        error.message ||
-                        "Could not connect to Flask. Check that the server is running.";
-
-                } finally {
-                    button.disabled = false;
-                    button.textContent = "Sign in →";
+                    data = await response.json();
+                } catch (_) {
+                    throw new Error("The server returned an unreadable response.");
                 }
-            });
-    </script>
 
+                if (!response.ok || !data.success) {
+                    throw new Error(
+                        data.message || "Unable to sign in. Check your credentials and try again."
+                    );
+                }
+
+                if (data.role === "admin") {
+                    showMessage("Sign-in successful. Redirecting…", "success");
+                    window.location.href = "/admin";
+                } else if (data.role === "user") {
+                    showMessage("Sign-in successful. Redirecting…", "success");
+                    window.location.href = "/user";
+                } else {
+                    throw new Error(
+                        "Your account role could not be identified. Please contact the administrator."
+                    );
+                }
+            } catch (error) {
+                showMessage(
+                    error.message || "Could not connect to the server. Please check that the application is running.",
+                    "error"
+                );
+                console.error(error);
+            } finally {
+                button.disabled = false;
+                button.textContent = "Sign in  →";
+            }
+        });
+
+        function showMessage(message, type) {
+            result.textContent = message;
+            result.className = type || "";
+        }
+    </script>
 </body>
 </html>
