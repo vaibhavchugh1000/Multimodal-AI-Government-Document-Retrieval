@@ -65,7 +65,13 @@ def build_prompt(query, retrieved_documents, language):
             f"[Chunk ID: {document.get('chunk_id', 'Unknown')}]\n"
             f"{text}"
         )
-
+        
+        print("distance of chunk ",index,"from query embedding = ",document["distance"])
+        print("chunk id of chunk ",index," = ",document["chunk_id"])
+        print("evidence id of chunk ",index," = ",document["evidence_id"])
+        
+            
+            
     context = "\n\n".join(context_parts)
 
     prompt = f"""
@@ -105,6 +111,35 @@ FORMATTING INSTRUCTIONS:
 6. Place explanatory labels and descriptions outside mathematical expressions.
 7. Do not include unnecessary backslashes or line-break commands inside mathematical delimiters.
 8. Do not use trailing backslashes for line breaks. Use normal Markdown line breaks, headings, or bullet points.
+
+RETRIEVED CONTEXT RELEVANCE INSTRUCTIONS:
+1. Examine every retrieved evidence chunk independently before
+   generating the answer.
+
+2. Determine whether each chunk is directly relevant to the
+   user's latest question.
+
+3. Use only chunks that contain information directly relevant
+   to answering the question.
+
+4. Ignore irrelevant chunks, even if they contain information
+   about the same broad subject or keywords as the question.
+
+5. Do not force information from every retrieved chunk into
+   the answer.
+
+6. Do not cite irrelevant chunks as supporting evidence.
+
+7. If a chunk contains both relevant and irrelevant information, 
+extract only the relevant information. Do not use unrelated information from that 
+chunk to expand the answer or support additional findings.
+
+8. If only some aspects of the question are supported by the
+   relevant chunks, answer those aspects and clearly identify
+   what could not be established from the available context.
+
+9. Base Key Findings and their Evidence IDs exclusively on
+   the chunks actually used to support each finding.
 
 User's Latest Question:
 {query}

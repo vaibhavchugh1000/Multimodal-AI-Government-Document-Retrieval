@@ -16,4 +16,5 @@ def generate_response(prompt):
         contents=prompt
     )
 
+    print("LLM response : ",response.text)
     return response.text
