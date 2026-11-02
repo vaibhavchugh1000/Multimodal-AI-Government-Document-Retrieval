@@ -158,7 +158,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:14px/1.6 Inter,ui-sans
     border-left:4px solid var(--gov-green);border-radius:9px;
     color:var(--muted);font-size:11px;background:var(--surface);
 }
-/* Feedback UI: visual prototype only; no backend calls are made. */
+/* Feedback UI connected to the Flask feedback API. */
 .feedback-panel {
     margin-top:22px;padding:17px 0 0;border-top:1px solid var(--border);
 }
@@ -359,13 +359,13 @@ body{margin:0;background:var(--bg);color:var(--text);font:14px/1.6 Inter,ui-sans
                 <div class="feedback-panel" id="feedbackPanel">
                     <div class="feedback-question">Was this answer helpful?</div>
                     <div class="feedback-buttons">
-                        <button class="feedback-btn positive" id="helpfulFeedback" type="button">👍 Helpful</button>
-                        <button class="feedback-btn negative" id="notHelpfulFeedback" type="button">👎 Not helpful</button>
+                        <button class="feedback-btn positive" id="helpfulFeedback" type="button" disabled>👍 Helpful</button>
+                        <button class="feedback-btn negative" id="notHelpfulFeedback" type="button" disabled>👎 Not helpful</button>
                     </div>
                     <div class="feedback-thanks" id="feedbackThanks" role="status" aria-live="polite">
                         ✓ Thank you for your feedback!
                     </div>
-                    <div class="feedback-note">Your feedback helps improve the quality of this assistant. This is a visual prototype; responses are not submitted or stored.</div>
+                    <div class="feedback-note">Your feedback is submitted and stored to help improve this assistant.</div>
                 </div>
             </section>
             <div class="gov-footer-accent" aria-hidden="true"></div>
@@ -757,6 +757,10 @@ async function askQuestion(event) {
         }
 
         // New structured response: direct_answer, key_findings, citation_list and language.
+        if (!Number.isInteger(data.interaction_id) || data.interaction_id <= 0) {
+            throw new Error("The answer was returned without a valid interaction ID. Feedback is unavailable.");
+        }
+        enableFeedbackForInteraction(data.interaction_id);
         const jsonLlmResponse = data.result || {};
         const citationList = jsonLlmResponse.citation_list || {};
         const validEvidenceIds = displaySources(citationList);
@@ -784,7 +788,10 @@ async function askQuestion(event) {
     }
 }
 
-// Feedback wireframe interactions only: no fetch(), Flask route, or database integration.
+// Feedback is linked to the interaction created by /user/query.
+let currentInteractionId = null;
+let feedbackSubmitting = false;
+
 const helpfulFeedback = document.getElementById("helpfulFeedback");
 const notHelpfulFeedback = document.getElementById("notHelpfulFeedback");
 const feedbackThanks = document.getElementById("feedbackThanks");
@@ -799,34 +806,100 @@ function closeFeedbackDialog() {
     feedbackBackdrop.classList.remove("visible");
     feedbackBackdrop.setAttribute("aria-hidden", "true");
 }
+
 function resetFeedbackVisual() {
-    helpfulFeedback.disabled = false;
-    notHelpfulFeedback.disabled = false;
+    currentInteractionId = null;
+    feedbackSubmitting = false;
+    helpfulFeedback.disabled = true;
+    notHelpfulFeedback.disabled = true;
     helpfulFeedback.classList.remove("selected");
     notHelpfulFeedback.classList.remove("selected");
     feedbackThanks.classList.remove("visible");
+    feedbackThanks.textContent = "✓ Thank you for your feedback!";
     if (feedbackComment) feedbackComment.value = "";
     if (feedbackCharCount) feedbackCharCount.textContent = "0";
-    if (feedbackBackdrop) {
-        feedbackBackdrop.querySelectorAll('input[type="checkbox"]').forEach(input => input.checked = false);
-    }
-    if (feedbackBackdrop) closeFeedbackDialog();
+    feedbackBackdrop.querySelectorAll('input[type="checkbox"]').forEach(input => input.checked = false);
+    closeFeedbackDialog();
 }
-helpfulFeedback.addEventListener("click", () => {
+
+function enableFeedbackForInteraction(interactionId) {
+    currentInteractionId = interactionId;
+    helpfulFeedback.disabled = false;
+    notHelpfulFeedback.disabled = false;
+}
+
+function showFeedbackError(message) {
+    feedbackThanks.textContent = message || "Unable to save feedback. Please try again.";
+    feedbackThanks.classList.add("visible");
+    feedbackThanks.style.background = "color-mix(in srgb, var(--danger) 8%, var(--surface))";
+    feedbackThanks.style.color = "var(--danger)";
+}
+
+async function sendFeedback(isHelpful, comment = null) {
+    if (!currentInteractionId || feedbackSubmitting) {
+        showFeedbackError("Please submit a question and wait for its answer before giving feedback.");
+        return false;
+    }
+
+    feedbackSubmitting = true;
     helpfulFeedback.disabled = true;
     notHelpfulFeedback.disabled = true;
-    helpfulFeedback.classList.add("selected");
-    feedbackThanks.textContent = "✓ Thank you for your feedback!";
-    feedbackThanks.classList.add("visible");
+    submitFeedbackVisual.disabled = true;
+
+    try {
+        const response = await fetch("/feedback", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                interaction_id: currentInteractionId,
+                is_helpful: isHelpful,
+                comment: comment
+            })
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.success) {
+            throw new Error(data.error || data.message || "Unable to save feedback.");
+        }
+
+        helpfulFeedback.classList.toggle("selected", isHelpful);
+        notHelpfulFeedback.classList.toggle("selected", !isHelpful);
+        feedbackThanks.style.background = "";
+        feedbackThanks.style.color = "";
+        feedbackThanks.textContent = "✓ Thank you! Your feedback has been saved.";
+        feedbackThanks.classList.add("visible");
+        closeFeedbackDialog();
+        return true;
+    } catch (error) {
+        showFeedbackError(error.message);
+        helpfulFeedback.disabled = false;
+        notHelpfulFeedback.disabled = false;
+        console.error("Feedback submission failed:", error);
+        return false;
+    } finally {
+        feedbackSubmitting = false;
+        submitFeedbackVisual.disabled = false;
+    }
+}
+
+helpfulFeedback.addEventListener("click", async () => {
+    await sendFeedback(true);
 });
+
 notHelpfulFeedback.addEventListener("click", () => {
+    if (!currentInteractionId) {
+        showFeedbackError("Please submit a question and wait for its answer before giving feedback.");
+        return;
+    }
     feedbackBackdrop.classList.add("visible");
     feedbackBackdrop.setAttribute("aria-hidden", "false");
     feedbackComment.focus();
 });
+
 feedbackComment.addEventListener("input", () => {
     feedbackCharCount.textContent = String(feedbackComment.value.length);
 });
+
 closeFeedbackModal.addEventListener("click", closeFeedbackDialog);
 cancelFeedback.addEventListener("click", closeFeedbackDialog);
 feedbackBackdrop.addEventListener("click", event => {
@@ -835,14 +908,25 @@ feedbackBackdrop.addEventListener("click", event => {
 document.addEventListener("keydown", event => {
     if (event.key === "Escape" && feedbackBackdrop.classList.contains("visible")) closeFeedbackDialog();
 });
-submitFeedbackVisual.addEventListener("click", () => {
-    closeFeedbackDialog();
-    helpfulFeedback.disabled = true;
-    notHelpfulFeedback.disabled = true;
-    notHelpfulFeedback.classList.add("selected");
-    feedbackThanks.textContent = "✓ Thank you for your feedback!";
-    feedbackThanks.classList.add("visible");
+
+submitFeedbackVisual.addEventListener("click", async () => {
+    const selectedReasons = Array.from(
+        feedbackBackdrop.querySelectorAll('input[type="checkbox"]:checked')
+    ).map(input => input.value);
+
+    const additionalComment = feedbackComment.value.trim();
+    const commentParts = [];
+    if (selectedReasons.length) {
+        commentParts.push("Reasons: " + selectedReasons.join(", "));
+    }
+    if (additionalComment) {
+        commentParts.push("Comment: " + additionalComment);
+    }
+
+    const combinedComment = commentParts.length ? commentParts.join("\n") : null;
+    await sendFeedback(false, combinedComment);
 });
+
 
 </script>
 
