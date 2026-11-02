@@ -17,3 +17,6 @@ data/documents/
 
 # VS Code
 .vscode/
+
+# Runtime database
+feedback.db
