@@ -9,9 +9,7 @@ from get_directory_documents import get_documents
 
 from feedback_store import (
     initialize_feedback_db,
-    save_interaction,
-    save_feedback,
-    save_feedback_comment,
+    save_feedback
 )
 
 # Initialize the feedback database when the application starts.
@@ -97,20 +95,14 @@ def user_query():
         }), 400
 
     try:
-        result = user_query_pipeline(query.strip())
-
-        # Store the question, answer, and retrieved sources.
-        # The interaction ID links later feedback to this response.
-        interaction_id = save_interaction(
-            question=result["query"],
-            answer=result["answer"],
-            sources=result["sources"],
-        )
+        # user_pipeline stores the interaction and retrieved chunks.
+        # app.py only forwards the pipeline output to the frontend.
+        pipeline_output = user_query_pipeline(query.strip())
 
         return jsonify({
             "success": True,
-            "result": result,
-            "interaction_id": interaction_id,
+            "interaction_id": pipeline_output["interaction_id"],
+            "result": pipeline_output["result"]
         })
 
     except Exception:
@@ -242,7 +234,7 @@ def admin_process():
 
 
 # --------------------------------------------------
-# Feedback Rating API
+# Feedback API
 # --------------------------------------------------
 
 @app.route("/feedback", methods=["POST"])
@@ -250,7 +242,8 @@ def submit_feedback():
     data = request.get_json(silent=True) or {}
 
     interaction_id = data.get("interaction_id")
-    rating = data.get("rating")
+    is_helpful = data.get("is_helpful")
+    comment = data.get("comment")
 
     if (
         isinstance(interaction_id, bool)
@@ -262,59 +255,23 @@ def submit_feedback():
             "error": "Invalid interaction ID",
         }), 400
 
-    if isinstance(rating, bool) or rating not in (1, -1):
+    if not isinstance(is_helpful, bool):
         return jsonify({
             "success": False,
-            "error": "Invalid rating",
+            "error": "is_helpful must be true or false",
+        }), 400
+
+    if comment is not None and not isinstance(comment, str):
+        return jsonify({
+            "success": False,
+            "error": "Comment must be text",
         }), 400
 
     try:
-        save_feedback(interaction_id, rating)
+        save_feedback(interaction_id, is_helpful, comment)
         return jsonify({
             "success": True,
-            "message": "Rating saved successfully",
-        })
-
-    except Exception:
-        app.logger.exception("Unable to save rating")
-        return jsonify({
-            "success": False,
-            "error": "Unable to save rating",
-        }), 500
-
-
-# --------------------------------------------------
-# Feedback Comment API
-# --------------------------------------------------
-
-@app.route("/feedback/comment", methods=["POST"])
-def submit_feedback_comment():
-    data = request.get_json(silent=True) or {}
-
-    interaction_id = data.get("interaction_id")
-    comment = data.get("comment", "")
-
-    if (
-        isinstance(interaction_id, bool)
-        or not isinstance(interaction_id, int)
-        or interaction_id <= 0
-    ):
-        return jsonify({
-            "success": False,
-            "error": "Invalid interaction ID",
-        }), 400
-
-    if not isinstance(comment, str) or not comment.strip():
-        return jsonify({
-            "success": False,
-            "error": "Please enter a comment",
-        }), 400
-
-    try:
-        save_feedback_comment(interaction_id, comment.strip())
-        return jsonify({
-            "success": True,
-            "message": "Comment saved successfully",
+            "message": "Feedback saved successfully",
         })
 
     except ValueError as error:
@@ -324,10 +281,10 @@ def submit_feedback_comment():
         }), 400
 
     except Exception:
-        app.logger.exception("Unable to save feedback comment")
+        app.logger.exception("Unable to save feedback")
         return jsonify({
             "success": False,
-            "error": "Unable to save comment",
+            "error": "Unable to save feedback. Check the Flask server log.",
         }), 500
 
 

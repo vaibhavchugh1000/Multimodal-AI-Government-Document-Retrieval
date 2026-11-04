@@ -71,6 +71,16 @@ body{margin:0;background:var(--bg);color:var(--text);font:14px/1.6 Inter,ui-sans
 .answer-status{display:none;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;background:var(--success-bg);color:var(--success);font-size:11px;font-weight:750}
 .answer-body{line-height:1.8;font-size:14px;color:var(--text);overflow-wrap:anywhere;min-height:20px}
 .answer-body p{margin:0 0 12px}.answer-body p:last-child{margin-bottom:0}
+
+.answer-section{margin:0 0 20px}
+.answer-section:last-child{margin-bottom:0}
+.answer-section-title{font-size:15px;font-weight:800;color:var(--ink);margin:0 0 9px}
+.key-finding{padding:13px 14px;margin:0 0 10px;border:1px solid var(--border);border-radius:10px;background:var(--surface2)}
+.key-finding:last-child{margin-bottom:0}
+.key-finding-text{line-height:1.8}
+.finding-evidence{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:10px;font-size:11px;color:var(--muted)}
+.finding-evidence-label{font-weight:750}
+
 .answer-body h1,.answer-body h2,.answer-body h3,.answer-body h4{font-size:1.08em;letter-spacing:0;margin:16px 0 8px;color:var(--ink)}
 .answer-body ul,.answer-body ol{padding-left:22px;margin:8px 0 14px}.answer-body li{margin:4px 0}
 .answer-body strong{font-weight:750;color:var(--ink)}
@@ -148,7 +158,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:14px/1.6 Inter,ui-sans
     border-left:4px solid var(--gov-green);border-radius:9px;
     color:var(--muted);font-size:11px;background:var(--surface);
 }
-/* Feedback UI: visual prototype only; no backend calls are made. */
+/* Feedback UI connected to the Flask feedback API. */
 .feedback-panel {
     margin-top:22px;padding:17px 0 0;border-top:1px solid var(--border);
 }
@@ -349,13 +359,13 @@ body{margin:0;background:var(--bg);color:var(--text);font:14px/1.6 Inter,ui-sans
                 <div class="feedback-panel" id="feedbackPanel">
                     <div class="feedback-question">Was this answer helpful?</div>
                     <div class="feedback-buttons">
-                        <button class="feedback-btn positive" id="helpfulFeedback" type="button">👍 Helpful</button>
-                        <button class="feedback-btn negative" id="notHelpfulFeedback" type="button">👎 Not helpful</button>
+                        <button class="feedback-btn positive" id="helpfulFeedback" type="button" disabled>👍 Helpful</button>
+                        <button class="feedback-btn negative" id="notHelpfulFeedback" type="button" disabled>👎 Not helpful</button>
                     </div>
                     <div class="feedback-thanks" id="feedbackThanks" role="status" aria-live="polite">
                         ✓ Thank you for your feedback!
                     </div>
-                    <div class="feedback-note">Your feedback helps improve the quality of this assistant. This is a visual prototype; responses are not submitted or stored.</div>
+                    <div class="feedback-note">Your feedback is submitted and stored to help improve this assistant.</div>
                 </div>
             </section>
             <div class="gov-footer-accent" aria-hidden="true"></div>
@@ -441,20 +451,48 @@ function safeDisplay(value, fallback = "") {
 }
 
 function getMetadata(source) {
-    return source && source.metadata && typeof source.metadata === "object" ? source.metadata : {};
+    return source && source.metadata && typeof source.metadata === "object"
+        ? source.metadata
+        : {};
 }
+
 function firstValue(...values) {
     return values.find(value => value !== undefined && value !== null && value !== "");
 }
-function getSourceFields(source, index) {
-    const item = source && typeof source === "object" && !Array.isArray(source) ? source : { text: String(source ?? "") };
+
+function getSourceFields(source, index, evidenceId) {
+    const item = source && typeof source === "object" && !Array.isArray(source)
+        ? source
+        : { text: String(source ?? "") };
     const metadata = getMetadata(item);
+
+    const rawSource = firstValue(
+        item.document_name, metadata.document_name,
+        item.file_name, metadata.file_name,
+        item.filename, metadata.filename,
+        item.source, metadata.source
+    );
+
+    const name = rawSource
+        ? String(rawSource).split(/[\\/]/).pop()
+        : "Retrieved document";
+
     return {
         item,
-        name: firstValue(item.document_name, metadata.document_name, item.source, metadata.source, item.file_name, metadata.file_name, item.filename, metadata.filename, "Retrieved document"),
-        page: firstValue(item.page_number, metadata.page_number, item.page, metadata.page),
-        text: firstValue(item.text, item.content, item.page_content, metadata.text, metadata.content, ""),
-        evidenceId: firstValue(item.evidence_id, metadata.evidence_id),
+        name,
+        page: firstValue(
+            item.page_number, metadata.page_number,
+            item.page, metadata.page
+        ),
+        chunkId: firstValue(
+            item.chunk_id, metadata.chunk_id,
+            item.id, metadata.id
+        ),
+        text: firstValue(
+            item.text, item.content, item.page_content,
+            metadata.text, metadata.content, ""
+        ),
+        evidenceId: evidenceId || firstValue(item.evidence_id, metadata.evidence_id),
         index
     };
 }
@@ -478,21 +516,27 @@ function fileType(name) {
     return ["PDF", "DOCX", "TXT"].includes(extension) ? extension : "DOC";
 }
 
-function displaySources(sourceItems) {
+function displaySources(citationList) {
     sourcesDiv.replaceChildren();
-    const list = Array.isArray(sourceItems) ? sourceItems : [];
-    sourceCount.textContent = String(list.length);
-    sourceLabel.textContent = `(${list.length})`;
 
-    if (!list.length) {
+    // New backend structure: citation_list is { "E001": complete_doc_record, ... }.
+    const entries = citationList && typeof citationList === "object" && !Array.isArray(citationList)
+        ? Object.entries(citationList)
+        : [];
+
+    sourceCount.textContent = String(entries.length);
+    sourceLabel.textContent = `(${entries.length})`;
+
+    if (!entries.length) {
         sourcesDiv.innerHTML = '<div class="empty-sources">No sources were returned for this answer.</div>';
         return new Set();
     }
 
     const validEvidenceIds = new Set();
-    list.forEach((source, index) => {
-        const fields = getSourceFields(source, index);
-        const { name, page, text, evidenceId } = fields;
+
+    entries.forEach(([evidenceId, source], index) => {
+        const fields = getSourceFields(source, index, evidenceId);
+        const { name, page, chunkId, text } = fields;
         const card = document.createElement("article");
         card.className = "source-card";
 
@@ -503,17 +547,26 @@ function displaySources(sourceItems) {
 
         const top = document.createElement("div");
         top.className = "source-top";
+
         const icon = document.createElement("div");
         icon.className = "pdf-icon";
         icon.textContent = fileType(name);
+
         const info = document.createElement("div");
         info.className = "source-info";
+
         const title = document.createElement("div");
         title.className = "source-name";
         title.textContent = name;
+
         const pageText = document.createElement("div");
         pageText.className = "source-page";
-        pageText.textContent = page !== undefined ? `Page ${page}` : `Source ${index + 1}`;
+        const details = [];
+        if (page !== undefined) details.push(`Page ${page}`);
+        else details.push(`Source ${index + 1}`);
+        if (chunkId !== undefined) details.push(`Chunk ${chunkId}`);
+        pageText.textContent = details.join(" · ");
+
         info.append(title, pageText);
 
         if (typeof evidenceId === "string" && /^E\d{3}$/.test(evidenceId)) {
@@ -522,14 +575,18 @@ function displaySources(sourceItems) {
             badge.textContent = `[${evidenceId}]`;
             info.appendChild(badge);
         }
+
         top.append(icon, info);
         card.appendChild(top);
 
-        if (text) {
+        if (text !== undefined && text !== null && text !== "") {
             const fullTextValue = String(text);
+
             const preview = document.createElement("p");
             preview.className = "source-excerpt";
-            preview.textContent = fullTextValue.length > 260 ? fullTextValue.slice(0, 260).trim() + "…" : fullTextValue;
+            preview.textContent = fullTextValue.length > 260
+                ? fullTextValue.slice(0, 260).trim() + "…"
+                : fullTextValue;
             card.appendChild(preview);
 
             const fullText = document.createElement("div");
@@ -549,85 +606,120 @@ function displaySources(sourceItems) {
                 card.appendChild(toggle);
             }
         }
+
         sourcesDiv.appendChild(card);
     });
+
     return validEvidenceIds;
 }
 
-// Convert [E001] text markers into links only when a matching source card exists.
-// This runs on the already-sanitized Markdown DOM and uses DOM nodes, not HTML strings.
-function linkEvidenceReferences(container, validEvidenceIds) {
-    if (!validEvidenceIds.size) return;
+function openEvidenceCard(evidenceId) {
+    const card = document.getElementById(`source-${evidenceId}`);
+    if (!card) return;
 
-    const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
-        acceptNode(node) {
-            // Match both [E001] and grouped citations such as [E001, E002].
-            if (!/\[\s*E\d{3}(?:\s*,\s*E\d{3})*\s*\]/.test(node.nodeValue || "")) {
-                return NodeFilter.FILTER_REJECT;
+    card.classList.add("expanded", "highlighted");
+    const toggle = card.querySelector(".source-toggle");
+    if (toggle) toggle.textContent = "Show less";
+
+    card.scrollIntoView({ behavior: "smooth", block: "center" });
+    window.setTimeout(() => card.classList.remove("highlighted"), 1800);
+}
+
+function createEvidenceLink(evidenceId, validEvidenceIds) {
+    if (validEvidenceIds.has(evidenceId)) {
+        const link = document.createElement("a");
+        link.href = `#source-${evidenceId}`;
+        link.className = "evidence-link";
+        link.textContent = evidenceId;
+        link.addEventListener("click", event => {
+            event.preventDefault();
+            openEvidenceCard(evidenceId);
+        });
+        return link;
+    }
+
+    return document.createTextNode(evidenceId);
+}
+
+function renderStructuredAnswer(answerContainer, response, validEvidenceIds) {
+    answerContainer.replaceChildren();
+
+    // 1. Direct Answer — intentionally has no Evidence ID links.
+    const directSection = document.createElement("section");
+    directSection.className = "answer-section";
+
+    const directHeading = document.createElement("h3");
+    directHeading.className = "answer-section-title";
+    directHeading.textContent = "Direct Answer";
+
+    const directText = document.createElement("div");
+    directText.className = "answer-body";
+    const directAnswer = response?.direct_answer?.text;
+    renderMarkdown(
+        directText,
+        safeDisplay(directAnswer, "No direct answer was returned.")
+    );
+
+    directSection.append(directHeading, directText);
+    answerContainer.appendChild(directSection);
+
+    // 2. Key Findings — each finding displays only its own Evidence IDs.
+    const findings = Array.isArray(response?.key_findings)
+        ? response.key_findings
+        : [];
+
+    if (findings.length) {
+        const findingsSection = document.createElement("section");
+        findingsSection.className = "answer-section";
+
+        const findingsHeading = document.createElement("h3");
+        findingsHeading.className = "answer-section-title";
+        findingsHeading.textContent = "Key Findings";
+        findingsSection.appendChild(findingsHeading);
+
+        findings.forEach((finding, index) => {
+            const findingCard = document.createElement("article");
+            findingCard.className = "key-finding";
+
+            const findingText = document.createElement("div");
+            findingText.className = "key-finding-text";
+            renderMarkdown(
+                findingText,
+                safeDisplay(finding?.text, `Finding ${index + 1}`)
+            );
+            findingCard.appendChild(findingText);
+
+            const evidenceIds = Array.isArray(finding?.evidence_ids)
+                ? finding.evidence_ids
+                : [];
+
+            if (evidenceIds.length) {
+                const evidenceRow = document.createElement("div");
+                evidenceRow.className = "finding-evidence";
+
+                const evidenceLabel = document.createElement("span");
+                evidenceLabel.className = "finding-evidence-label";
+                evidenceLabel.textContent = "Sources:";
+
+                evidenceRow.appendChild(evidenceLabel);
+
+                evidenceIds.forEach((evidenceId, evidenceIndex) => {
+                    if (evidenceIndex > 0) {
+                        evidenceRow.appendChild(document.createTextNode(", "));
+                    }
+                    evidenceRow.appendChild(
+                        createEvidenceLink(String(evidenceId), validEvidenceIds)
+                    );
+                });
+
+                findingCard.appendChild(evidenceRow);
             }
 
-            const parent = node.parentElement;
-            if (parent && ["A", "CODE", "PRE", "SCRIPT", "STYLE"].includes(parent.tagName)) {
-                return NodeFilter.FILTER_REJECT;
-            }
-            return NodeFilter.FILTER_ACCEPT;
-        }
-    });
+            findingsSection.appendChild(findingCard);
+        });
 
-    const textNodes = [];
-    while (walker.nextNode()) textNodes.push(walker.currentNode);
-
-    // Capture the complete bracketed group, then link each ID independently.
-    const pattern = /\[\s*(E\d{3}(?:\s*,\s*E\d{3})*)\s*\]/g;
-
-    textNodes.forEach(node => {
-        const value = node.nodeValue;
-        let lastIndex = 0;
-        let match;
-        const fragment = document.createDocumentFragment();
-
-        pattern.lastIndex = 0;
-        while ((match = pattern.exec(value)) !== null) {
-            fragment.appendChild(document.createTextNode(value.slice(lastIndex, match.index)));
-
-            const evidenceIds = match[1].split(/\s*,\s*/);
-            fragment.appendChild(document.createTextNode("["));
-
-            evidenceIds.forEach((evidenceId, index) => {
-                if (index > 0) {
-                    fragment.appendChild(document.createTextNode(", "));
-                }
-
-                if (validEvidenceIds.has(evidenceId)) {
-                    const link = document.createElement("a");
-                    link.href = `#source-${evidenceId}`;
-                    link.className = "evidence-link";
-                    link.textContent = evidenceId;
-
-                    link.addEventListener("click", () => {
-                        const card = document.getElementById(`source-${evidenceId}`);
-                        if (card) {
-                            card.classList.add("expanded", "highlighted");
-                            const toggle = card.querySelector(".source-toggle");
-                            if (toggle) toggle.textContent = "Show less";
-                            window.setTimeout(() => card.classList.remove("highlighted"), 1800);
-                        }
-                    });
-
-                    fragment.appendChild(link);
-                } else {
-                    // Keep unknown IDs visible as plain text; never link to a missing source.
-                    fragment.appendChild(document.createTextNode(evidenceId));
-                }
-            });
-
-            fragment.appendChild(document.createTextNode("]"));
-            lastIndex = pattern.lastIndex;
-        }
-
-        fragment.appendChild(document.createTextNode(value.slice(lastIndex)));
-        node.parentNode.replaceChild(fragment, node);
-    });
+        answerContainer.appendChild(findingsSection);
+    }
 }
 
 async function askQuestion(event) {
@@ -664,15 +756,21 @@ async function askQuestion(event) {
             throw new Error(data.message || "Unable to answer this question.");
         }
 
-        // Preserve the existing Major response structure: data.result.answer/language/sources.
-        const result = data.result || {};
-        const sources = Array.isArray(result.sources) ? result.sources : [];
-        const validEvidenceIds = displaySources(sources);
+        // New structured response: direct_answer, key_findings, citation_list and language.
+        if (!Number.isInteger(data.interaction_id) || data.interaction_id <= 0) {
+            throw new Error("The answer was returned without a valid interaction ID. Feedback is unavailable.");
+        }
+        enableFeedbackForInteraction(data.interaction_id);
+        const jsonLlmResponse = data.result || {};
+        const citationList = jsonLlmResponse.citation_list || {};
+        const validEvidenceIds = displaySources(citationList);
 
-        answerDiv.replaceChildren();
-        renderMarkdown(answerDiv, safeDisplay(result.answer, "No answer was returned."));
-        linkEvidenceReferences(answerDiv, validEvidenceIds);
-        languageDiv.textContent = safeDisplay(result.language, "Not detected");
+        renderStructuredAnswer(answerDiv, jsonLlmResponse, validEvidenceIds);
+
+        languageDiv.textContent = safeDisplay(
+            jsonLlmResponse.language || jsonLlmResponse.response_language,
+            "Not detected"
+        );
         answerStatus.style.display = "inline-flex";
         showMessage("", "");
     } catch (error) {
@@ -690,7 +788,10 @@ async function askQuestion(event) {
     }
 }
 
-// Feedback wireframe interactions only: no fetch(), Flask route, or database integration.
+// Feedback is linked to the interaction created by /user/query.
+let currentInteractionId = null;
+let feedbackSubmitting = false;
+
 const helpfulFeedback = document.getElementById("helpfulFeedback");
 const notHelpfulFeedback = document.getElementById("notHelpfulFeedback");
 const feedbackThanks = document.getElementById("feedbackThanks");
@@ -705,34 +806,100 @@ function closeFeedbackDialog() {
     feedbackBackdrop.classList.remove("visible");
     feedbackBackdrop.setAttribute("aria-hidden", "true");
 }
+
 function resetFeedbackVisual() {
-    helpfulFeedback.disabled = false;
-    notHelpfulFeedback.disabled = false;
+    currentInteractionId = null;
+    feedbackSubmitting = false;
+    helpfulFeedback.disabled = true;
+    notHelpfulFeedback.disabled = true;
     helpfulFeedback.classList.remove("selected");
     notHelpfulFeedback.classList.remove("selected");
     feedbackThanks.classList.remove("visible");
+    feedbackThanks.textContent = "✓ Thank you for your feedback!";
     if (feedbackComment) feedbackComment.value = "";
     if (feedbackCharCount) feedbackCharCount.textContent = "0";
-    if (feedbackBackdrop) {
-        feedbackBackdrop.querySelectorAll('input[type="checkbox"]').forEach(input => input.checked = false);
-    }
-    if (feedbackBackdrop) closeFeedbackDialog();
+    feedbackBackdrop.querySelectorAll('input[type="checkbox"]').forEach(input => input.checked = false);
+    closeFeedbackDialog();
 }
-helpfulFeedback.addEventListener("click", () => {
+
+function enableFeedbackForInteraction(interactionId) {
+    currentInteractionId = interactionId;
+    helpfulFeedback.disabled = false;
+    notHelpfulFeedback.disabled = false;
+}
+
+function showFeedbackError(message) {
+    feedbackThanks.textContent = message || "Unable to save feedback. Please try again.";
+    feedbackThanks.classList.add("visible");
+    feedbackThanks.style.background = "color-mix(in srgb, var(--danger) 8%, var(--surface))";
+    feedbackThanks.style.color = "var(--danger)";
+}
+
+async function sendFeedback(isHelpful, comment = null) {
+    if (!currentInteractionId || feedbackSubmitting) {
+        showFeedbackError("Please submit a question and wait for its answer before giving feedback.");
+        return false;
+    }
+
+    feedbackSubmitting = true;
     helpfulFeedback.disabled = true;
     notHelpfulFeedback.disabled = true;
-    helpfulFeedback.classList.add("selected");
-    feedbackThanks.textContent = "✓ Thank you for your feedback!";
-    feedbackThanks.classList.add("visible");
+    submitFeedbackVisual.disabled = true;
+
+    try {
+        const response = await fetch("/feedback", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                interaction_id: currentInteractionId,
+                is_helpful: isHelpful,
+                comment: comment
+            })
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.success) {
+            throw new Error(data.error || data.message || "Unable to save feedback.");
+        }
+
+        helpfulFeedback.classList.toggle("selected", isHelpful);
+        notHelpfulFeedback.classList.toggle("selected", !isHelpful);
+        feedbackThanks.style.background = "";
+        feedbackThanks.style.color = "";
+        feedbackThanks.textContent = "✓ Thank you! Your feedback has been saved.";
+        feedbackThanks.classList.add("visible");
+        closeFeedbackDialog();
+        return true;
+    } catch (error) {
+        showFeedbackError(error.message);
+        helpfulFeedback.disabled = false;
+        notHelpfulFeedback.disabled = false;
+        console.error("Feedback submission failed:", error);
+        return false;
+    } finally {
+        feedbackSubmitting = false;
+        submitFeedbackVisual.disabled = false;
+    }
+}
+
+helpfulFeedback.addEventListener("click", async () => {
+    await sendFeedback(true);
 });
+
 notHelpfulFeedback.addEventListener("click", () => {
+    if (!currentInteractionId) {
+        showFeedbackError("Please submit a question and wait for its answer before giving feedback.");
+        return;
+    }
     feedbackBackdrop.classList.add("visible");
     feedbackBackdrop.setAttribute("aria-hidden", "false");
     feedbackComment.focus();
 });
+
 feedbackComment.addEventListener("input", () => {
     feedbackCharCount.textContent = String(feedbackComment.value.length);
 });
+
 closeFeedbackModal.addEventListener("click", closeFeedbackDialog);
 cancelFeedback.addEventListener("click", closeFeedbackDialog);
 feedbackBackdrop.addEventListener("click", event => {
@@ -741,14 +908,25 @@ feedbackBackdrop.addEventListener("click", event => {
 document.addEventListener("keydown", event => {
     if (event.key === "Escape" && feedbackBackdrop.classList.contains("visible")) closeFeedbackDialog();
 });
-submitFeedbackVisual.addEventListener("click", () => {
-    closeFeedbackDialog();
-    helpfulFeedback.disabled = true;
-    notHelpfulFeedback.disabled = true;
-    notHelpfulFeedback.classList.add("selected");
-    feedbackThanks.textContent = "✓ Thank you for your feedback!";
-    feedbackThanks.classList.add("visible");
+
+submitFeedbackVisual.addEventListener("click", async () => {
+    const selectedReasons = Array.from(
+        feedbackBackdrop.querySelectorAll('input[type="checkbox"]:checked')
+    ).map(input => input.value);
+
+    const additionalComment = feedbackComment.value.trim();
+    const commentParts = [];
+    if (selectedReasons.length) {
+        commentParts.push("Reasons: " + selectedReasons.join(", "));
+    }
+    if (additionalComment) {
+        commentParts.push("Comment: " + additionalComment);
+    }
+
+    const combinedComment = commentParts.length ? commentParts.join("\n") : null;
+    await sendFeedback(false, combinedComment);
 });
+
 
 </script>
 

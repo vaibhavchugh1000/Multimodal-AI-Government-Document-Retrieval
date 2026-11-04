@@ -364,6 +364,32 @@ body{margin:0;background:var(--bg);color:var(--text);font:14px/1.6 Inter,ui-sans
     </main>
 </div>
 
+<div class="feedback-modal-backdrop" id="feedbackModalBackdrop" aria-hidden="true">
+    <section class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedbackModalTitle">
+        <div class="feedback-modal-head">
+            <h3 id="feedbackModalTitle">Share Feedback</h3>
+            <button class="feedback-close" id="closeFeedbackModal" type="button" aria-label="Close">×</button>
+        </div>
+        <p><strong>What was wrong with this answer?</strong> (Select one or more)</p>
+        <div class="feedback-reasons">
+            <label class="feedback-reason"><input type="checkbox" value="Incorrect information"> Incorrect information</label>
+            <label class="feedback-reason"><input type="checkbox" value="Incomplete answer"> Incomplete answer</label>
+            <label class="feedback-reason"><input type="checkbox" value="Irrelevant answer"> Irrelevant answer</label>
+            <label class="feedback-reason"><input type="checkbox" value="Missing source / evidence"> Missing source / evidence</label>
+            <label class="feedback-reason"><input type="checkbox" value="Difficult to understand"> Difficult to understand</label>
+            <label class="feedback-reason"><input type="checkbox" value="Outdated information"> Outdated information</label>
+            <label class="feedback-reason"><input type="checkbox" value="Other"> Other (please specify)</label>
+        </div>
+        <label class="feedback-comment-label" for="feedbackComment">Additional comment (optional)</label>
+        <textarea class="feedback-comment" id="feedbackComment" maxlength="500" placeholder="Tell us what could be improved..."></textarea>
+        <div class="feedback-counter"><span id="feedbackCharCount">0</span> / 500</div>
+        <div class="feedback-modal-footer">
+            <button class="feedback-btn" id="cancelFeedback" type="button">Cancel</button>
+            <button class="primary" id="submitFeedbackVisual" type="button">Submit Feedback</button>
+        </div>
+    </section>
+</div>
+
 <script>
 const root = document.documentElement;
 const themeToggle = document.getElementById("themeToggle");
@@ -685,10 +711,12 @@ function resetFeedbackVisual() {
     helpfulFeedback.classList.remove("selected");
     notHelpfulFeedback.classList.remove("selected");
     feedbackThanks.classList.remove("visible");
-    feedbackComment.value = "";
-    feedbackCharCount.textContent = "0";
-    feedbackBackdrop.querySelectorAll('input[type="checkbox"]').forEach(input => input.checked = false);
-    closeFeedbackDialog();
+    if (feedbackComment) feedbackComment.value = "";
+    if (feedbackCharCount) feedbackCharCount.textContent = "0";
+    if (feedbackBackdrop) {
+        feedbackBackdrop.querySelectorAll('input[type="checkbox"]').forEach(input => input.checked = false);
+    }
+    if (feedbackBackdrop) closeFeedbackDialog();
 }
 helpfulFeedback.addEventListener("click", () => {
     helpfulFeedback.disabled = true;
@@ -724,31 +752,7 @@ submitFeedbackVisual.addEventListener("click", () => {
 
 </script>
 
-<div class="feedback-modal-backdrop" id="feedbackModalBackdrop" aria-hidden="true">
-    <section class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedbackModalTitle">
-        <div class="feedback-modal-head">
-            <h3 id="feedbackModalTitle">Share Feedback</h3>
-            <button class="feedback-close" id="closeFeedbackModal" type="button" aria-label="Close">×</button>
-        </div>
-        <p><strong>What was wrong with this answer?</strong> (Select one or more)</p>
-        <div class="feedback-reasons">
-            <label class="feedback-reason"><input type="checkbox" value="Incorrect information"> Incorrect information</label>
-            <label class="feedback-reason"><input type="checkbox" value="Incomplete answer"> Incomplete answer</label>
-            <label class="feedback-reason"><input type="checkbox" value="Irrelevant answer"> Irrelevant answer</label>
-            <label class="feedback-reason"><input type="checkbox" value="Missing source / evidence"> Missing source / evidence</label>
-            <label class="feedback-reason"><input type="checkbox" value="Difficult to understand"> Difficult to understand</label>
-            <label class="feedback-reason"><input type="checkbox" value="Outdated information"> Outdated information</label>
-            <label class="feedback-reason"><input type="checkbox" value="Other"> Other (please specify)</label>
-        </div>
-        <label class="feedback-comment-label" for="feedbackComment">Additional comment (optional)</label>
-        <textarea class="feedback-comment" id="feedbackComment" maxlength="500" placeholder="Tell us what could be improved..."></textarea>
-        <div class="feedback-counter"><span id="feedbackCharCount">0</span> / 500</div>
-        <div class="feedback-modal-footer">
-            <button class="feedback-btn" id="cancelFeedback" type="button">Cancel</button>
-            <button class="primary" id="submitFeedbackVisual" type="button">Submit Feedback</button>
-        </div>
-    </section>
-</div>
+
 
 </body>
 </html>

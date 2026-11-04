@@ -28,7 +28,7 @@ def retrieve_documents(query, top_k):
         n_results=top_k
     )
 
-    retrieved_documents = []
+    retrieved_documents = list()
 
     documents = results["documents"][0]
     metadatas = results["metadatas"][0]
