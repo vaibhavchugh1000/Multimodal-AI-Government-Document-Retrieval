@@ -162,6 +162,14 @@ def admin_process():
 
     try:
         DOCUMENTS_DIR.mkdir(parents=True, exist_ok=True)
+
+        # Check if a document with the same filename already exists
+        if document_path.exists():
+            return jsonify({
+                "success": False,
+                "message": f"Duplicate file: {safe_filename} is already uploaded.",
+            }), 409
+
         document.save(str(document_path))
 
         result = process_document(document_path)
