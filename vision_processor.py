@@ -47,4 +47,10 @@ def analyse_image(image_bytes, prompt, mime_type):
         ]
     )
 
-    return response.text.strip()
+    if response.text:
+        return response.text.strip()
+
+    print("Warning: Vision model returned no text.")
+    print(f"Response: {response}")
+
+    return ""
