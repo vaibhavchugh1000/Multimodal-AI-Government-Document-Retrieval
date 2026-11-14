@@ -556,43 +556,6 @@ python test_ocr_processor.py
 
 ---
 
-## 📊 Evaluation
-
-The project is intended to be evaluated using metrics covering different stages of the pipeline.
-
-Important evaluation areas include:
-
-### OCR Performance
-
-- OCR extraction success
-- Text extraction quality
-- Scanned-page processing
-
-### Retrieval Performance
-
-- Retrieval accuracy
-- Precision@K
-- Recall@K
-- Relevant chunk retrieval
-
-### Generation Performance
-
-- Answer correctness
-- Faithfulness to retrieved context
-- Source attribution
-- Response quality
-
-### System Performance
-
-- Document processing time
-- Embedding generation time
-- Retrieval latency
-- LLM response latency
-
-Evaluation results should be recorded along with screenshots and test evidence for reproducibility.
-
----
-
 ## 🔐 Reliability and Document Validation
 
 Government documents require additional reliability considerations.
